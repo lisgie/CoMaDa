@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>WSN Administration</title>
+		<meta charset="UTF-8"/>
+		<link href="/index/css/main.css" rel="stylesheet" type="text/css" />
+		<link href="/index/css/vtip.css" rel="stylesheet" type="text/css" />
+		<script src="/index/js/jquery-1.7.1.min.js" type="text/javascript"></script>
+		<script src="/index/js/jquery.transit.js" type="text/javascript"></script>
+		<script src="/index/js/vtip-min.js" type="text/javascript"></script>
+		<!-- <script src="/index/js/angular.js"></script>
+		<script src="/index/js/angularApp.js"></script> -->
+		<script src="/index/js/template.js" type="text/javascript"></script>	
+		<script src="/index/js/tools.js" type="text/javascript"></script>	
+		<link rel="stylesheet" type="text/css" href="/menu/css/superfish.css" media="screen">
+		<link rel="stylesheet" type="text/css" href="/menu/css/superfish-vertical.css" media="screen">
+		<script type="text/javascript" src="/menu/js/hoverIntent.js"></script>
+		<script type="text/javascript" src="/menu/js/superfish.js"></script>
+
+		<script type="text/javascript">
+			/**
+			 * required vars:
+			 *		uri_defaults = {
+			 *		 	controller: defaultController,
+			 *		 	action: defaultAction
+			 *		}
+					module_links = {
+					 	moduleClass: [["linkName","link"]]
+					}
+			 */
+			var uri={
+				controller: null,
+				action: null,
+				actionPath: null,
+			};
+
+			var temp=/^\/(.*?)((\/(.*?)((\/(.*)$)|$))|$)/.exec(window.location.pathname);
+			uri.controller = temp[1] ? temp[1] : uri_defaults.controller;
+			uri.action = temp[4] ? temp[4] : uri_defaults.action;
+			uri.actionPath = temp[6] ? temp[6] : "/";
+			
+		</script>
+		<script type="text/javascript">
+			// include angular loader, which allows the files to load in any order
+			/*
+				AngularJS v1.0.0rc1
+				(c) 2010-2012 AngularJS http://angularjs.org
+				License: MIT
+			*/
+			'use strict';(function(i){function d(c,a,e){return c[a]||(c[a]=e())}return d(d(i,"angular",Object),"module",function(){var c={};return function(a,e,f){e&&c.hasOwnProperty(a)&&(c[a]=null);return d(c,a,function(){function b(a,b,d){return function(){c[d||"push"]([a,b,arguments]);return g}}if(!e)throw Error("No module: "+a);var c=[],d=[],h=b("$injector","invoke"),g={_invokeQueue:c,_runBlocks:d,requires:e,name:a,provider:b("$provide","provider"),factory:b("$provide","factory"),service:b("$provide","service"),
+			value:b("$provide","value"),constant:b("$provide","constant","unshift"),filter:b("$filterProvider","register"),directive:b("$compileProvider","directive"),config:h,run:function(a){d.push(a);return this}};f&&h(f);return g})}})})(window);
+	
+			// include a third-party async loader library
+			/*!
+			 * $script.js v1.3
+			 * https://github.com/ded/script.js
+			 * Copyright: @ded & @fat - Dustin Diaz, Jacob Thornton 2011
+			 * Follow our software http://twitter.com/dedfat
+			 * License: MIT
+			 */
+			!function(a,b,c){function t(a,c){var e=b.createElement("script"),f=j;e.onload=e.onerror=e[o]=function(){e[m]&&!/^c|loade/.test(e[m])||f||(e.onload=e[o]=null,f=1,c())},e.async=1,e.src=a,d.insertBefore(e,d.firstChild)}function q(a,b){p(a,function(a){return!b(a)})}var d=b.getElementsByTagName("head")[0],e={},f={},g={},h={},i="string",j=!1,k="push",l="DOMContentLoaded",m="readyState",n="addEventListener",o="onreadystatechange",p=function(a,b){for(var c=0,d=a.length;c<d;++c)if(!b(a[c]))return j;return 1};!b[m]&&b[n]&&(b[n](l,function r(){b.removeEventListener(l,r,j),b[m]="complete"},j),b[m]="loading");var s=function(a,b,d){function o(){if(!--m){e[l]=1,j&&j();for(var a in g)p(a.split("|"),n)&&!q(g[a],n)&&(g[a]=[])}}function n(a){return a.call?a():e[a]}a=a[k]?a:[a];var i=b&&b.call,j=i?b:d,l=i?a.join(""):b,m=a.length;c(function(){q(a,function(a){h[a]?(l&&(f[l]=1),o()):(h[a]=1,l&&(f[l]=1),t(s.path?s.path+a+".js":a,o))})},0);return s};s.get=t,s.ready=function(a,b,c){a=a[k]?a:[a];var d=[];!q(a,function(a){e[a]||d[k](a)})&&p(a,function(a){return e[a]})?b():!function(a){g[a]=g[a]||[],g[a][k](b),c&&c(d)}(a.join("|"));return s};var u=a.$script;s.noConflict=function(){a.$script=u;return this},typeof module!="undefined"&&module.exports?module.exports=s:a.$script=s}(this,document,setTimeout)
+	
+			// load all of the dependencies asynchronously.
+			$script([
+				"/index/js/angular.js",
+				"/index/js/angularApp.js",
+			], "basics");
+			var widget_urls=[];
+			for (var w in widgets) {
+				widget_urls.push(widgets[w]);
+			}
+			$script.ready("basics", function() {
+				$script(widget_urls, "widgets");
+			});
+			$script.ready(["basics","widgets"], function() {
+				// when all is done, execute bootstrap angular application
+				angular.bootstrap(document, ['wsnApp']);
+			});
+		</script>
+	</head>
+		
+	<body>
+		<div id="driver-panel" class="driver-panel" style="display: none;"></div>
+		<script type="text/javascript">
+		if (driver.status != "running") {
+			$("#driver-panel")
+				.addClass(driver.status!=null ? driver.status : "error")
+				.text((driver.name!=null ? driver.name+": " : "") + (driver.msg!=null ? driver.msg : "no driver specified"))
+				.show();
+		}
+		</script>
+		<div id="header" class="panel">
+			<a href="/index/shutdown" style="position: absolute; right: 50px; top: 24px;"><img src="/index/img/shutdown.png" class="vtip" title="shutdown" style="width: 24px; height: 24px;"/></a>
+			
+			<div>
+				<h2 class="title" style="padding: 0; margin: 0; margin-bottom: 5px;">
+					WSN Administration
+				</h2>
+			</div>
+			<div id="menu-wrapper" style="margin: auto; width: auto;">
+					<ul style="" class="sf-menu header_link_container">
+					</ul>
+			</div>
+			<script type="text/javascript">
+			$(function() {
+
+				if (module_links != null) {
+					// add links
+					var nextLinks=[{"item": module_links, "list": $(".header_link_container")}];
+					
+					var depth=0;
+					while (nextLinks.length>0) {	
+						var curLinks = nextLinks;
+						nextLinks=[];
+						
+						for (var i=0; i<curLinks.length; i++) {
+							
+							for (var key in curLinks[i]['item']) {
+
+								if (typeof curLinks[i]['item'][key] == "string") {
+									
+									// link							
+									var inCurrentLink=false;
+									if (current_link.length > depth && current_link[depth] == key && (depth==0 || curLinks[i]['list'].parents("li").is(".current"))) {
+										inCurrentLink=true;
+									}
+									curLinks[i]['list'].append($("<li class='"+(inCurrentLink?"current":"")+"'><a href='"+curLinks[i]['item'][key]+"'>"+key+"</a></li>"));
+									
+								} else { 
+									
+									// group									
+									var inCurrentLink=false;
+									if (current_link.length > depth && current_link[depth] == key && (depth==0 || curLinks[i]['list'].parents("li").is(".current"))) {
+										inCurrentLink=true;
+									}
+									var href = curLinks[i]['item'][key]!=null ? curLinks[i]['item'][key][""] : null;
+									var list = $("<li class='"+(inCurrentLink?"current":"")+"'><a href='"+href+"' "+ (href==null?"onclick='return false;'":"") +">"+key+"</a><ul></ul></li>");
+									curLinks[i]['list'].append(list);
+									
+									nextLinks.push({"item": curLinks[i]['item'][key], "list": list.find("ul")});
+									
+								}
+								
+							}
+
+						}
+						depth++;
+					}
+				}
+				
+
+				jQuery('ul.sf-menu').superfish();
+
+		        var width = 0;
+		        $('ul.sf-menu').children().each(function(){
+		            width += $(this).width()+1;
+		        });
+		        $('#menu-wrapper').width(width);
+			});
+			</script>
+		</div>
+		
+		<div id="body">
+		</div>
+		
+		<div id="tools">
+			<!-- Tools -->
+			<div style="position: fixed; right: 6px; bottom: 13px; height: 13px; width: 143px; padding: 3px 13px 7px 13px; background-color: #455875;">
+				<a href="#" style="color: white; font-weight: bold;" onclick="return toggle_numberConverter();">Number-Converter</a>
+			</div>
+			<div id="numberConverter" style="display: none; position: fixed; right:6px; bottom: 13px; background-color: #455875; font-size: 0.9em;">
+				<table style="color: white;  border: 1px solid black; border-collapse:collapse; font-size: 0.9em;">
+					<tr style="border: 1px solid black;">
+						<td style="border: 1px solid black; padding: 5px 10px 5px 5px; font-weight: bold; text-align: right;">Hexadecimal</td>
+						<td style="border: 1px solid black; padding: 5px 10px 5px 5px; font-weight: bold; text-align: right;">Decimal</td>
+						<td style="border: 1px solid black; padding: 5px 10px 5px 5px; font-weight: bold; text-align: right;">Binär</td>
+						<td style="text-align:center;"><img src="/index/img/minimize.png" style="vertical-align: middle; width: 80%; cursor: pointer;" onclick="return toggle_numberConverter();"></td>
+					</tr>
+					<tr style="border: 1px solid black;">
+						<td style="border: 1px solid black; padding: 5px; text-align: right;"><input class="hex" type="text" style="width: 50px; height: 20px; font-size: 1.1em; text-align: right;" value=""/></td>
+						<td style="border: 1px solid black; padding: 5px; text-align: right;"><input class="dec" type="text" style="width: 50px; height: 20px; font-size: 1.1em; text-align: right;" value=""/></td>
+						<td style="border: 1px solid black; padding: 5px; text-align: right;"><input class="bin" type="text" style="width: 50px; height: 20px; font-size: 1.1em; text-align: right;" value=""/></td>
+						<td style="text-align: center;"><input class="add" type="button" value="+" style="width: 23px; height: 20px;"/></td>
+					</tr>
+					<tr class="entry" style="font-weight: bold;">
+						<td style="border: 1px solid black; padding: 5px 10px 5px 5px; text-align: right;" class="hex"></td>
+						<td style="border: 1px solid black; padding: 5px 10px 5px 5px; text-align: right;" class="dec"></td>
+						<td style="border: 1px solid black; padding: 5px 10px 5px 5px; text-align: right;" class="bin"></td>
+						<td style="text-align: center;"><input type="button" value="-" style="width: 50%; height: 15px;"/></td>
+					</tr>
+				</table>
+			</div>
+			<script type="text/javascript">
+				var numberConverterTpl = create_template($("#numberConverter"), function() {
+					var numberConverter=this;
+					this.entryTpl = create_template(this.el.find(".entry"), function(hex, dec, bin) {
+						this.hex = hex;
+						
+						this.el.find(".hex").text(hex);
+						this.el.find(".dec").text(dec);
+						this.el.find(".bin").text(bin);
+						this.el.find("input[type=\"button\"]").bind("click", {numberConverter: numberConverter, hex: hex}, function(eve) {
+							eve.data.numberConverter.remEntry(eve.data.hex);
+						});
+					}, {
+						hex: null
+					});
+					this.entries = {};
+					
+					this.el.find(".add").bind("click", {_this: this}, function(eve) {
+						var parent = $(this).parents("tr");
+						eve.data._this.addEntry(parent.find("input.hex").val(), parent.find("input.dec").val(), parent.find("input.bin").val());
+	
+						parent.find("input.hex").val("");
+						parent.find("input.dec").val("");
+						parent.find("input.bin").val("");
+					});
+				}, {
+					entryTpl: null,
+					entries: null,
+					
+					addEntry: function(hexInput, decInput, binInput) {
+						// parse input
+						hexInput = parseInt(hexInput, 16);
+						if (isNaN(hexInput)) {
+							hexInput = null;
+						}
+						decInput = parseInt(decInput);
+						if (isNaN(decInput)) {
+							decInput = null;
+						}
+						binInput = parseInt(binInput, 2);
+						if (isNaN(binInput)) {
+							binInput = null;
+						}
+	
+						function _addEntry(dec) {
+							var hex = "0x"+dec.toString(16);
+							var bin = "0b"+dec.toString(2);
+							if (this.entries[hex] != null) return;
+							
+							var entry = new this.entryTpl(hex, dec, bin);
+							this.entries[hex] = entry;
+							entry.appendTo(this.el.find("table"));
+							
+							$.ajax({
+								"url": "/index/numberconverter",
+								"data": {add: {hex: hex}},
+								"dataType": "json",
+								success: function(data){
+								},
+								error: function(){},
+							});
+						}
+	
+						// parse hex input
+						if (hexInput != null) {
+							_addEntry.apply(this, [hexInput]);
+						}
+						// parse dec input
+						if (decInput != null) {
+							_addEntry.apply(this, [decInput]);
+						}
+						// parse bin input
+						if (binInput != null) {
+							_addEntry.apply(this, [binInput]);
+						}
+					},
+					remEntry: function(hex) {
+						if (this.entries[hex]==null) return;
+	
+						$.ajax({
+							"url": "/index/numberconverter",
+							"data": {rem: {hex: hex}},
+							"dataType": "json",
+							success: function(data){
+							},
+							error: function(){},
+						});
+						
+						this.entries[hex].el.remove();
+						delete(this.entries[hex]);
+					}
+				});
+				var numberConverter = new numberConverterTpl();
+				numberConverter.appendTo($(document.body));
+				function toggle_numberConverter(force) {
+					if (force===true || (force!==false && $("#numberConverter").css("display") == "none")) {
+						$("#numberConverter").show();
+						$("#tool-menu-wrapper").css("visibility", "hidden");
+						
+						$.ajax({
+							"url": "/index/numberconverter",
+							"data": {status: "open"},
+							"dataType": "json"
+						});
+					} else {
+						$("#numberConverter").hide();
+						$("#tool-menu-wrapper").css("visibility", "visible");
+						
+						$.ajax({
+							"url": "/index/numberconverter",
+							"data": {status: "close"},
+							"dataType": "json"
+						});
+					}
+					
+					return false;
+				}
+				
+				$(function() {
+					for (var hex in numberConverterCache.entries) {
+						numberConverter.addEntry(hex, null);
+					}
+					toggle_numberConverter(numberConverterCache.open);
+				})
+				</script>
+			<!------------------>
+		</div>
+	</body>
+</html>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	<unit-translations>
+		<for type="Temperature">
+			<translation from="°C" to="°F">
+			<![CDATA[
+				((value * 9) / 5) + 32;
+			]]>
+			</translation>
+			<translation from="°F" to="°C">
+			<![CDATA[
+				(value - 32) * 5 / 9;
+			]]>
+			</translation>
+			<translation from="°C" to="K">
+			<![CDATA[
+				value + 273.15;
+			]]>
+			</translation>
+			<translation from="K" to="°C">
+			<![CDATA[
+				value - 273.15;
+			]]>
+			</translation>
+		</for>
+	</unit-translations>
+</configuration>

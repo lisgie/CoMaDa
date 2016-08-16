@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+	<body>
+		<h2 class="page-title">Nodes + Topology</h2>
+
+		<div>
+			<div>
+				<div id="chart" style="float: left; margin-top: 0px;">No data received yet.</div>
+				<div id="nodes" style="margin-top: 0px; padding-top: 35px;">
+
+				</div>
+			</div>
+			<script type='text/javascript'>
+				/*
+				 * required vars:
+			     * 		wsnnodes = {
+				 *			node_data: {
+				 *	 			nodeID: [
+				 *	 			    {
+				 *	 					name: eventName, 
+				 *	 					type: eventType, 
+				 *	 					fieldID: eventFieldID, 
+				 *	 					value: eventValue, 
+				 *	 					unit: eventUnit
+				 *	 				}
+				 *	 			]
+				 *			}
+				 *		}
+				 */
+
+				$(function(){
+					
+					if (wsnnodes!=null) {
+
+						$("#chart").empty();
+						
+						/* show graph */
+						var graph = new topologyTpl(wsnnodes);
+						graph.appendTo("#chart");
+						
+						/* show node entries */
+						for (var nodeID in wsnnodes) {
+							var entry = new nodeTpl(wsnnodes[nodeID]);
+							entry.el.bind("mouseenter", {nodeID: nodeID}, function(eve) {
+								graph.highlightLinks(eve.data.nodeID);
+							}).bind("mouseleave", {nodeID: nodeID}, function(eve) {
+								graph.unhighlightLinks(eve.data.nodeID);
+							});
+							entry.appendTo($("#nodes"));
+						}
+						
+						
+					}
+				});
+			</script>
+		</div>
+	</body>
+</html>

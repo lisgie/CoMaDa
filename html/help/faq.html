@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<style type="text/css">
+		#faqs {
+			display: none;
+		}
+		</style>
+	</head>
+	
+	<body>
+		<h2 class="page-title">FAQ</h2>
+		
+		
+		
+		
+		<ul id="faqs">
+			<!-- Hier FAQs eintragen -->
+			<li>
+				<ul>
+					<li>Frage1?</li>
+					<li>
+						Antwort...
+					</li>
+				</ul>
+			</li>
+			
+			<li>
+				<ul>
+					<li>Interesting PDFs</li>
+					<li>
+						<a href="/index/pdfs/2012-06-14-TinyIPFIX-Decodierung.pdf">2012-06-14-TinyIPFIX-Decodierung.pdf</a><br/>
+						<a href="/index/pdfs/blip-tutorial.pdf">blip-tutorial.pdf</a><br/>
+						<a href="/index/pdfs/Opal Flyer Final.pdf">Opal Flyer Final.pdf</a>
+					</li>
+				</ul>
+			</li>
+			<!------------------------->
+		</ul>
+		
+		
+		
+		
+		<!------------- !!! DO NOT EDIT BELOW THIS LINE !!! --------------->
+		<div>
+			<ul id="faqs-display">
+				<li class="faq">
+					<div style="font-weight: bold; font-size: 1.1em;">
+						<a class="title" id="frage1" href="#frage1" ></a>
+					</div>
+					<div class="content" style="padding: 5px 0px 10px 10px;"></div>
+				</li>
+			</ul>
+			
+			<div>
+				For for information see <a href="http://wikistudi.corinna-schmitt.de/doku.php">Online-Wiki</a>.
+			</div>
+			
+			<script type="text/javascript">
+			var faqTpl = create_template($("#faqs-display .faq"), function(title, content, id) {
+				this.el.find(".title").attr("id", id).attr("href", "#"+id).html(title);
+				this.el.find(".content").append(content);
+			});
+			
+			$(function() {
+				var faqCounter=0;
+				$("#faqs").find("li ul").each(function() {
+					var title = $(this).find("li").first().html();
+					var content = $(this).find("li:first-child ~ li").first().html();
+						
+					var faqEntry = new faqTpl(title, content, "faq"+faqCounter);
+					faqEntry.appendTo($("#faqs-display"));	
+				
+					faqCounter++;
+				});
+			});
+			</script>
+		</div>
+	</body>
+</html>

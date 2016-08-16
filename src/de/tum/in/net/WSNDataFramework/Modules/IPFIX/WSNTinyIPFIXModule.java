@@ -1,0 +1,289 @@
+package de.tum.in.net.WSNDataFramework.Modules.IPFIX;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.DatagramSocket;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import de.tum.in.net.WSNDataFramework.Node;
+import de.tum.in.net.WSNDataFramework.WSNModule;
+import de.tum.in.net.WSNDataFramework.Modules.HTTPServer.WSNHTTPServerModule;
+import de.tum.in.net.WSNDataFramework.Modules.TinyOS.DataPacket;
+
+/**
+ * Module handling data coming from an (tiny)IPFIX based WSN. Listening to UDP socket.
+ * Handles IPFIX messages as well as tinyIPFIX ones.
+ * 
+ * @author André Freitag
+ *
+ */
+public class WSNTinyIPFIXModule extends WSNModule {
+
+	private BufferedReader stdInput;
+	private Process tunslip6Process;
+	private static final String TUNSLIP6 = "./tunslip6";
+	private String tunslip6Args;
+	private String usbDevice;
+	
+	/* constructors  */
+	/**
+	 * listen to :port, use pathToMetdata to parse packets
+	 * 
+	 * @param pathToMetadata path to metadata file used to translate incoming packets
+	 * @param port to listen to
+	 * @param data.getAddress() to listen to
+	 * @throws Exception
+	 */
+	public WSNTinyIPFIXModule(String pathToMetadata, int port) throws Exception {
+		this.usbDevice = "/dev/ttyUSB" + port;
+		this.tunslip6Args = "-s" + " " + usbDevice + " " + "aaaa::1/64 -v5";
+		
+		File usbDeviceFile = new File(usbDevice);
+		if (!usbDeviceFile.exists()) {
+			throw new IOException("Invalid packet USB port. Device file '" + usbDevice
+					+ "' does not exist.");
+		}
+		
+		// create parses instance
+		_parser = new TinyIPFIXParser();
+		_enricher = new IPFIXEnricher(pathToMetadata);
+
+		_setIdling("no data received yet");
+	}
+	/**
+	 * listen to :4739, use pathToMetdata to parse packets
+	 * 
+	 * @param pathToMetadata path to metadata file used to translate incoming packets
+	 * @param port to listen to
+	 * @throws Exception
+	 */
+	public WSNTinyIPFIXModule(String pathToConf) throws Exception {
+		this(pathToConf, 4739);
+	}
+
+
+	/* public methods */
+	//	/**
+	//	 * appends a message to the log
+	//	 *
+	//	 * @param msg
+	//	 * @return this for fluent interface
+	//	 */
+	//	public WSNTinyIPFIXModule log(String msg) {
+	//		_parser.log(msg);
+	//		return this;
+	//	}
+	//	public WSNTinyIPFIXModule clearLog() {
+	//		_parser.clearLog();
+	//		return this;
+	//	}
+	/**
+	 * gets logged messages
+	 */
+	public String getLog() {
+		return _parser.getLog();
+	}
+
+	/* overridden methods */
+	/**
+	 * name
+	 */
+	@Override
+	public String getName() {
+		return "TinyIPFIX Listener";
+	}
+
+	/**
+	 * init handler
+	 */
+	@Override
+	protected void _init() {
+		_moduleDependent(WSNHTTPServerModule.class, "_moduleDep", "_moduleRem");
+	}
+
+	/**
+	 * shutdown handler
+	 */
+	@Override
+	protected void _shutdown() {
+		try {
+			stdInput.close();
+			tunslip6Process.destroy();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+
+	/**
+	 * worker thread
+	 */
+	@Override
+	protected void _run() {
+
+		System.out.println("Listening on USB device: " + usbDevice);
+
+		//String[] fullCommand = { "/bin/bash", "-c",
+			//	"echo \"contiki\" | sudo -S" + " " + TUNSLIP6 + " " + tunslip6Args };
+		
+		String fullCommand = "sudo /home/livio/workspace/contiki-2.7/tools/tunslip6 -s /dev/ttyUSB0 aaaa:1/64 -v5";
+
+		try {
+			tunslip6Process = Runtime.getRuntime().exec(fullCommand);
+			stdInput = new BufferedReader(new InputStreamReader(tunslip6Process.getInputStream()));
+		} catch (Exception e) {
+			System.err.println("Exception when executing '" + fullCommand + "'.");
+			System.err.println("Exiting packet listener...");
+			e.printStackTrace();
+			System.exit(1);
+		}
+		
+		try {
+			while(!Thread.interrupted()){
+				System.out.println("The Thread for the USB device has started.");
+				/* receive datagram */
+				DataPacket p;
+				try {
+					p = _receiveDataPacket();
+				} catch (Exception e) {
+					System.out.println("Failed to get package!");
+					return;
+				}
+
+
+				/* parse datagram */
+				if (p!=null && p.data.length != 0) {
+					System.out.println("Some data packet received!");
+
+					try {
+						// parse packet
+						Map<String,List<IPFIXField>> fields = _parser.parse(p.data, p.address.getAddress());
+
+						System.out.println(_parser.getLog());
+						/* update WSN data if fields were received.. */
+						if (fields != null) {
+							Map<String,Node> nodes = new HashMap<String,Node>();
+
+							// generate nodes, fill nodes list
+							for (String nodeID : fields.keySet()) {
+
+								// add current node to list
+								Node node = this.app().wsn().node(nodeID); // use a copy of the WSN's node if it already exists..
+								if (node == null) {
+									node = new Node(nodeID, p.address);
+									this.app().wsn().addNode(node);
+								}
+								
+								nodes.put(nodeID, node);
+								
+								// enrich created nodes with the received fields
+								for (IPFIXField field : fields.get(nodeID)) {
+
+									IPFIXEnrichedField enrichedField = _enricher.enrich(field);
+									Node.Datum wsnNodeField = new Node.Datum(
+											enrichedField.templateField.getQualifier(),
+											enrichedField.name,
+											enrichedField.type,
+											enrichedField.value,
+											enrichedField.unit
+											);
+
+									nodes.get(nodeID).data().update(wsnNodeField);
+								}
+							}
+							System.out.println("It is runnning!");
+
+							// adapt status
+							if (this.getStatus().getStatus() != WSNModuleStatus.STATUS.RUNNING) {
+								_setRunning("up and running");
+							}
+						}
+					} catch (TinyIPFIXParser.ParseException e) {
+						System.err.println("COULDN'T PARSE IPFIX PACKET:");
+						e.printStackTrace();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+
+
+				
+					
+				} else { // 0 bytes received.. socket broken.
+					System.out.print("Nothing received!");
+					break;
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			// clean up..
+			try {
+				stdInput.close();
+				tunslip6Process.destroy();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	protected void _moduleDep(WSNHTTPServerModule m) {
+		try {
+			m.registerController("ipfix", HTTPController.class, this)
+			.getServerModule().registerLink(new String[]{"Visualisation","TinyIPFIX"}, "/ipfix");
+		} catch (InstantiationException e) {
+		}
+	}
+
+	/* protected helper	 */
+	/**
+	 * receive another data packet. blocks thread until a new packet is available.
+	 *
+	 * @return data packet
+	 * @throws IOException
+	 */
+	protected DataPacket _receiveDataPacket() throws IOException {
+		String line;
+		byte[] packet;
+		
+		while(true) {
+			line = stdInput.readLine();
+			
+			if (line != null && line.endsWith("write TUN")) {
+				line = stdInput.readLine();
+				line = line.substring(5);
+				packet = Converter.hexStringToByteArray(line.replaceAll(" ", ""));
+				try {
+					return new DataPacket(PacketUtils.extractPayload(packet), PacketUtils.extractSourceAddress(packet));
+				} catch (Exception e) {
+					throw new IOException(e);
+				}
+			}
+		}
+	}
+	
+	public static String toHexString(byte[] bytes) {
+		char[] hexArray = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
+		char[] hexChars = new char[bytes.length * 2];
+		int v;
+		for ( int j = 0; j < bytes.length; j++ ) {
+			v = bytes[j] & 0xFF;
+			hexChars[j*2] = hexArray[v/16];
+			hexChars[j*2 + 1] = hexArray[v%16];
+		}
+		return new String(hexChars);
+	}
+
+
+	//	/* protected members */
+	protected DatagramSocket _serverSocket;
+	protected TinyIPFIXParser _parser=null;
+	protected IPFIXEnricher _enricher=null;
+	
+	public DatagramSocket getServerSocket(){
+		return _serverSocket;
+	}	
+}

@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+<body>
+		<div class="node_entry" style="display: none; float: left; border: 1px dashed black; width: 200px; margin-bottom: 25px; margin-right: 34px; padding: 3px 7px 3px 7px; cursor: pointer;">
+			<div style=" margin-bottom: 3px;"><h3 style="margin: 0; padding: 0; font-size: 1.1em;">Node: <span class="nodeID"></span></h3></div>
+			<div class="fields">
+				<div class="field_entry" style=" font-size: 0.8em; padding-left: 10px; padding-right: 0 px; margin-bottom: 2px;">
+					<div class="id" style="display: none;"></div>
+					<div class="name" style="font-weight: bold;"></div>
+					<div class="text-align: left;">
+						<div style="margin-left: 20px;"><span class="value" ></span>&nbsp;<span class="unit" ></span></div>
+					</div>
+				</div>
+			</div>
+			<div class="aggregation" style="font-size: 0.85em; padding: 3px 0 5px 10px; margin: 2px -7px 0 -7px; border-top: 1px solid black;">
+				<div style="font-weight: bold; text-decoration: underline; margin-bottom: 3px;">Aggregates:</div>
+				<div class="aggregates" style="font-size: 0.9em; margin-left: 10px;">
+					<span class="aggregates_entry" style="padding-bottom: 2px; font-weight: bold;">
+						<a class="nodeID" href="#"></a>
+					</span>
+				</div>
+			</div>
+			<div class="info" style="font-size: 0.85em; padding-top: 3px; padding-left: 10px; margin: 2px -7px 0 -7px; border-top: 1px solid black;">
+				<div style="font-weight: bold; text-decoration: underline; margin-bottom: 3px;">Information:</div>
+				<table class="info-entries" style="border: 0; font-size: 0.9em; margin-left: 10px;">
+					<tr class="info-entry">
+						<td class="name" style="font-weight: bold;"></td>
+						<td class="value"></td>
+					</tr>
+				</table>
+			</div>
+			<div class="actions" style="font-size: 0.85em; padding-top: 3px; padding-left: 10px; margin: 2px -7px 0 -7px; border-top: 1px solid black;">
+				<div style="font-weight: bold; text-decoration: underline; margin-bottom: 3px;">Actions:</div>
+				<table class="action-entries" style="border: 0; font-size: 0.9em; margin-left: 10px;">
+					<tr class="action-entry">
+						<td>
+							<table style="border: 0; font-size: 0.9em;">
+								<tr>
+									<td class="name" style="font-weight: bold;"></td>
+								</tr>
+								<tr>
+									<td>
+										<span class="params">
+											<input class="param" type="text" style="width: 30px;" />
+										</span>
+										<input type="button" class="submit" value="do" />
+									</td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+		
+		<script type="text/javascript">
+
+				fieldTpl = create_template($(".node_entry .field_entry"), function(field) {
+
+					this.el.find(".id").text( field.fieldID );
+					this.el.find(".name").text( field.name!=null ? field.name : field.type );
+					this.el.find(".value").text( field.value );
+					this.el.find(".unit").text( field.unit!=null ? field.unit : "" );
+					
+				});
+				aggregationTpl = create_template($(".node_entry .aggregation"), function(aggregations, parentNodeID) {
+					var aggregationEntry = create_template(this.el.find(".aggregates_entry"), function(nodeID, parentNodeID) {
+						this.el.find(".nodeID").text(nodeID);
+						this.el.find(".nodeID").hover(function(eve) {
+							if (nodeTpl.entries[nodeID]!=null) {
+								nodeTpl.entries[nodeID].hover();
+							}
+						}, function(eve) {
+							if (nodeTpl.entries[nodeID]!=null) {
+								nodeTpl.entries[nodeID].hoverend();
+							}
+							if (nodeTpl.entries[parentNodeID]!=null) {
+								nodeTpl.entries[parentNodeID].hoverend();
+								nodeTpl.entries[parentNodeID].hover();
+							}
+						}).click(function(eve){eve.preventDefault();});							
+					});
+					
+					for (var i=0; i<aggregations.length; i++) {
+						var entry = new aggregationEntry(aggregations[i], parentNodeID);
+						if (i > 0) {
+							entry.el.find("a").prepend(" ");
+						}
+						if (i < (aggregations.length-1)) {
+							entry.el.find("a").append(",")
+						}
+						entry.appendTo(this.el.find(".aggregates"));
+					}
+				});
+				infoTpl = create_template($(".node_entry .info"), function(info) {
+					var infoEntry = create_template(this.el.find(".info-entry"), function(name, value) {
+						this.el.find(".name").text(name);
+						this.el.find(".value").text(value);
+					});
+					
+					for (var name in info) {
+						var entry = new infoEntry(name+":", info[name]);
+						entry.appendTo(this.el.find(".info-entries"));
+					}
+				});
+				actionsTpl = create_template($(".node_entry .actions"), function(actions, node) {
+					var actionEntry = create_template(this.el.find(".action-entry"), function(name, fullname, params, node) {
+						this.fullname = fullname;
+						this.name = name; 
+						this.params = params;
+						
+						var actionParam = create_template(this.el.find(".param"), function(name) {
+							this.el.attr("name", name);
+						});
+
+						this.el.find(".name").text(name);
+						for (var i in params) {
+							var entry = new actionParam(params[i]);
+							entry.appendTo(this.el.find(".params"));
+						}
+						
+						this.el.find(".submit").bind("click", {action: this, node: node}, function(eve) {
+							nodeID = eve.data.node.nodeID;
+							actionName = eve.data.action.name;
+							actionFullName = eve.data.action.fullname;
+							actionVals = {};
+							for (var i in eve.data.action.params) {
+								actionVals[eve.data.action.params[i]] = eve.data.action.el.find("input.param[name=\""+eve.data.action.params[i]+"\"]").val();
+							}
+							
+							eve.data.action.el.find(".submit").attr("disabled", "disabled");							
+							$.ajax({
+								"url": "/index/performnodeaction",
+								data: {"nodeID": nodeID, "action": actionFullName, "params": actionVals},
+								context: eve.data.action,
+								dataType: "json",
+								success: function(data) {
+									if (data.err != null) {
+										alert("FAILED: " + data.err);
+									} else {
+										alert("OK" + (data.msg!=null ? ": "+data.msg : ""));
+									}
+								},
+								error: function() {
+									alert("failed (ajax request failed)");
+								},
+								complete: function() {
+									this.el.find(".submit").removeAttr("disabled");
+								}
+							});
+						});
+					});
+					
+					for (var i in actions) {
+						var entry = new actionEntry(actions[i]['name'], actions[i]['fullname'], actions[i]['params'], node);
+						entry.appendTo(this.el.find(".action-entries"));
+					}
+				});
+				nodeTpl = create_template($(".node_entry").show(), function(wsnnode) {
+		
+					var _this=this;
+					this.node = wsnnode;
+					this.tpl.entries[this.node.nodeID] = this;
+					
+					this.el.find(".nodeID").text(this.node.nodeID);
+					for (var i=0; i<this.node.fields.length; i++) {
+						var field = new fieldTpl(this.node.fields[i]);
+						field.appendTo(this.el.find(".fields"));
+					}
+					
+					if (wsnnode.aggregates != null) {
+						var aggr = new aggregationTpl(wsnnode.aggregates, this.node.nodeID);
+						aggr.appendTo(this.el);
+					}
+					
+					if (wsnnode.info != null) {
+						var info = new infoTpl(wsnnode.info);
+						info.appendTo(this.el);
+					}
+					
+					if (wsnnode.actions != null) {
+						var actions = new actionsTpl(wsnnode.actions, wsnnode);
+						actions.appendTo(this.el);
+					}
+					
+					this.el.hover(function(eve) {
+		
+						_this.hover();
+						
+					}, function(eve) {
+						
+						_this.hoverend();
+						
+					});
+					
+				}, {
+					
+					hover: function() {
+						
+						this.origCss={
+							borderStyle: this.el.get(0).style.borderStyle, // didn't use jquerys css(), cause firefox had some problems with it..
+							borderColor: this.el.get(0).style.borderColor,
+							borderWidth: this.el.get(0).style.borderWidth,
+						};
+						this.el.css("border-style", "solid");
+						this.el.css("border-color", "#ba0000");
+						this.el.css("border-width", "2px");
+						this.el.css("margin-right", (parseInt(this.el.css("margin-right"))-2)+"px");
+						this.el.css("margin-bottom", (parseInt(this.el.css("margin-bottom"))-2)+"px");
+						
+					},
+					
+					hoverend: function() {
+
+						this.el.css("border-style", this.origCss.borderStyle);
+						this.el.css("border-color", this.origCss.borderColor);
+						this.el.css("border-width", this.origCss.borderWidth);
+						this.el.css("margin-right", (parseInt(this.el.css("margin-right"))+2)+"px");
+						this.el.css("margin-bottom", (parseInt(this.el.css("margin-bottom"))+2)+"px");
+						
+					}
+					
+				});
+				nodeTpl.entries={};
+
+		</script>
+</body>
+</html>

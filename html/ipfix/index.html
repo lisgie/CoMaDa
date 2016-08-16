@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+	<body>
+		<h2 class="page-title">TinyOS Listener View - TinyIPFIX</h2>
+		
+		<div>
+			<div style="height: 100%;">
+				<div style="float: left; width: 40%; height: 100%;">
+					<textarea class="exec_content" style="background-color: white; overflow-y: scroll; overflow-x: hidden; border: 1px solid gray; height: 100%; width: 100%; margin-top: 18px; font-size: 1.3em;">
+					</textarea>
+				</div>
+				<div style="float: left; width: 60%;">
+					<div id="chart" style="width: 100%;">
+					</div>
+					<div id="nodes" style="width: 100%; padding-left: 45px;">
+					</div>
+				</div>
+				<div style="clear: both;"></div>
+			</div>
+			
+			<script type="text/javascript">
+			var ipfixLogUpdateInterval=2000;
+			function update_log() {
+				$.ajax({
+					"url": "/ipfix/update",
+					"data": {},
+					"dataType": "json",
+					success: function(data){
+						if (data!=null && data.text!=null) {
+							var pcntg = get_scroll_pcntg($(".exec_content").get(0));
+							var scroll = pcntg!=null && pcntg<1 ? $(".exec_content").scrollTop() : null;
+
+							$(".exec_content").val(data.text);
+							$(".exec_content").scrollTop(scroll!=null ? scroll : $(".exec_content").get(0).scrollHeight);
+						}
+						
+						setTimeout(update_log, ipfixLogUpdateInterval);
+					},
+					error: function(){},
+				});
+			}
+			$(function() {
+				update_log();
+				
+				/* show graph */
+				var graph = new topologyTpl(wsnnodes);
+				graph.appendTo("#chart");
+				
+				/* show node entries */
+				for (var nodeID in wsnnodes) {
+					var entry = new nodeTpl(wsnnodes[nodeID]);
+					entry.el.bind("mouseenter", {nodeID: nodeID}, function(eve) {
+						graph.highlightLinks(eve.data.nodeID);
+					}).bind("mouseleave", {nodeID: nodeID}, function(eve) {
+						graph.unhighlightLinks(eve.data.nodeID);
+					});
+					entry.appendTo($("#nodes"));
+				}
+			})
+			</script>
+		</div>
+	</body>
+</html>

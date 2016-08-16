@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	<match>
+		<!--
+		
+		<field>
+			<name>Voltage TelosB</name> 				<- specific name of this field
+			
+			<fieldID>0x01</fieldID>						<- fieldID of the IPFIX template field.
+															Only the last Byte of the IPFIX fieldID is needed! (The first one is actually reserved for IPFIX+aggregation protocol but may also be passed for more specific matching..)
+			<enterpriseNumber>0x123</enterpriseNumber>	<- enterpriseNumber of the IPFIX template field.
+
+			<type>Voltage</type>						<- general type of the data this field represents
+			<unit>V</unit>								<- unit of the value that <expression><![CDATA[ returns
+			<expression><![CDATA[x]]></expression>					<- Expression for converting the field's payload. Must be a valid JavaScript statement.
+															The payload is interpreted as an unsigned number and passed to the script as `x`.
+															
+															If omitted the payload is not touched and passed along as byte[]
+		</field>
+		
+		-->
+		<field>
+			<type>Temperature</type>
+			<unit>°C</unit>
+			
+			<fieldID>0x01</fieldID>
+			<enterpriseNumber>0xf01</enterpriseNumber>
+			<expression><![CDATA[Math.round((0.01*x - 39.60) *100)/100]]></expression> <!--  if expression is given, value is assumed to be unsigned integer (converted to long) (or the next smaller size of non float point types), unsigned long is not available since there is no way to store an unsigned long in java -->
+			<!-- if no expression is given, data will be passed as byte[] -->
+		</field>
+		<field>
+			<name>Humidity (Sensiron SHT11)</name>
+			<type>Humidity</type>
+			<unit>%</unit>
+			
+			<fieldID>0x02</fieldID>
+			<enterpriseNumber>0xf01</enterpriseNumber>
+			<expression><![CDATA[Math.round(((0.0405 * x) + ((0 - 0.0000028) * (x * x)) - 4) *100)/100]]></expression>
+		</field>
+		<field>
+			<type>Temperature</type>
+			<unit>°C</unit>
+			
+			<fieldID>0x03</fieldID>
+			<enterpriseNumber>0xf03</enterpriseNumber>
+			<expression><![CDATA[Math.round(((1.0 / (0.00130705 + (0.000214381 * Math.log(((10000 * (1023-x))/x))) + (0.000000093 * ( (Math.log(((10000 * (1023-x))/x)) * (Math.log(((10000 * (1023-x))/x)) * Math.log(((10000 * (1023-x))/x)))) )))) - 273.15) *100)/100]]></expression>
+		</field>
+		<field>
+			<name>Voltage TelosB</name>
+			<type>Voltage</type>
+			<unit>V</unit>
+			
+			<fieldID>0x01</fieldID>
+			<enterpriseNumber>0xf02</enterpriseNumber>
+			<expression><![CDATA[Math.round(((x / 4096) * 3) *100)/100]]></expression>
+		</field>
+		<field>
+			<name>Voltage MTS400</name>
+			<type>Voltage</type>
+			<unit>V</unit>
+			
+			<fieldID>0x01</fieldID>
+			<enterpriseNumber>0xf06</enterpriseNumber>
+			<expression><![CDATA[Math.round(x *100)/100]]></expression>
+		</field>
+		<field>
+			<name>Sound (MTS300)</name>
+			<type>Sound</type>
+			
+			<fieldID>0x01</fieldID>
+			<enterpriseNumber>0xf04</enterpriseNumber>
+			<expression><![CDATA[Math.round(x *100)/100]]></expression>
+		</field>
+
+		<field>
+			<name>Light (MTS300)</name>
+			<type>Light</type>
+			<unit>LUX</unit>
+			
+			<fieldID>0x02</fieldID>
+			<enterpriseNumber>0xf04</enterpriseNumber>
+			<expression><![CDATA[Math.round(x *100)/100]]></expression>
+		</field>
+		<field>
+			<name>Light (TAOS TSL2550)</name>
+			<type>Light</type>
+			<unit>LUX</unit>
+			
+			<fieldID>0x01</fieldID>
+			<enterpriseNumber>0xf05</enterpriseNumber>
+			<expression><![CDATA[Math.round(x *100)/100]]></expression>
+		</field>
+		<field>
+			<type>NodeTime</type>
+			<unit>sec</unit>
+			
+			<fieldID>0x02</fieldID>
+			<enterpriseNumber>0x1</enterpriseNumber>
+			<expression><![CDATA[Math.round(x / 1024)]]></expression>
+		</field>
+		<field>
+			<type>NodeID</type>
+			
+			<fieldID>0x01</fieldID>
+			<enterpriseNumber>0x1</enterpriseNumber>
+			<expression><![CDATA[Math.round(x)]]></expression>
+		</field>
+		<field>
+			<type>Type</type>
+			<fieldID>0x8010</fieldID>
+			<enterpriseNumber>0xF10</enterpriseNumber>
+			<expression><![CDATA[Math.round(x)]]></expression>
+		</field>
+		
+		
+		
+		
+	<!-- Definitions for compatibility with legacy code (from Bachelor Thesis) follow-->
+		<field>
+			<type>Temperature</type>
+			<unit>°C</unit>
+			
+			<fieldID>0xA0</fieldID>
+			<enterpriseNumber>0xF0AA00AA</enterpriseNumber>
+			<expression><![CDATA[Math.round(((1.0 / (0.00130705 + (0.000214381 * Math.log(((10000 * (1023-x))/x))) + (0.000000093 * ( (Math.log(((10000 * (1023-x))/x)) * (Math.log(((10000 * (1023-x))/x)) * Math.log(((10000 * (1023-x))/x)))) )))) - 273.15) *100)/100]]></expression>
+		</field>
+		<field>
+			<type>Sound</type>
+			
+			<fieldID>0xA1</fieldID>
+			<enterpriseNumber>0xF0AA00AA</enterpriseNumber>
+			<expression><![CDATA[Math.round(x *100)/100]]></expression>
+		</field>
+		<field>
+			<type>Light</type>
+			<unit>LUX</unit>
+			
+			<fieldID>0xA2</fieldID>
+			<enterpriseNumber>0xF0AA00AA</enterpriseNumber>
+			<expression><![CDATA[Math.round(x *100)/100]]></expression>
+		</field>
+		<field>
+			<type>Pressure</type>
+			
+			<fieldID>0xA3</fieldID>
+			<enterpriseNumber>0xF0AA00AA</enterpriseNumber>
+			<expression><![CDATA[Math.round(x *100)/100]]></expression>
+		</field>
+		<field>
+			<type>NodeTime</type>
+			<unit>sec</unit>
+			
+			<fieldID>0xA4</fieldID>
+			<enterpriseNumber>0xF0AA00AA</enterpriseNumber>
+			<expression><![CDATA[Math.round(x/1024)]]></expression>
+		</field>
+		<field>
+			<type>NodeID</type>
+			
+			<fieldID>0xA5</fieldID>
+			<enterpriseNumber>0xF0AA00AA</enterpriseNumber>
+			<expression><![CDATA[Math.round(x *100)/100]]></expression>
+		</field>
+	</match>
+</configuration>
