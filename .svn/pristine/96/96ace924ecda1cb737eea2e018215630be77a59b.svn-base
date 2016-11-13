@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html>
+	<body> 
+		<!-- TinyOS test data
+				<script type="text/javascript">uri_defaults={"controller":"index","action":"index"};module_links={"Home":"\/","Hardware":{"TinyOS":"\/tinyos","Contiki":"\/index\/underconstruction"},"Visualisation":{"Topology":"\/index\/nodes","TinyIPFIX":"\/ipfix","COSM":"\/cosm","Log-Files":"\/index\/logs"},"Settings":{"Units":"\/settings\/units"},"About":{"FAQ":"\/help\/faq","FAQ (Online)":"http:\/\/wikistudi.corinna-schmitt.de\/doku.php","Interesting Links (Online)":"http:\/\/wikistudi.corinna-schmitt.de\/doku.php?id=interessante_links","Publications":"\/help\/publications","Impressum":"\/help\/impressum"}};current_link=["Hardware","TinyOS"];numberConverterCache={"open":false,"entries":{}};tinyos={"running":true,"version":"2.1.1","directories":{"base_station":{"IPBaseStation":"\/opt\/tinyos-2.1.1\/apps\/IPBaseStation"},"nodes":{"Aggregator Node":"\/home\/tinyos\/Desktop\/TinyIPFIXAggregation - BA-Benjamin\/aggregator_v3","Data Collector":"\/home\/tinyos\/Desktop\/TinyIPFIXAggregation - BA-Benjamin\/tinyIPFIX_BLIP_multiplatform_v2","BLIP":"\/home\/tinyos\/Desktop\/2011-04-13-Code-new - BA-Thomas\/tinyIPFIX_BLIP_multiplatform"}},"devices":[],"target_platforms":{"":["telos","shimmer2","tinynode","telosb","shimmer","micaz","epic","all","intelmote2","iris","null","mica2dot","mica2","eyesIFXv2","tmote","telosa","clean","eyesIFX","mulle","eyesIFXv1"],"avr":["reset"]},"make_extras":{"":["tosboot","appdoc","savepp","tframe","sim","dynthreads","tos_image","stack-check","safe","sim-sf","docs","tos_buildinfo","cthreads","wiring","nowiring","threads","ident_flags","verbose","sim-fast","tunit","blip"],"epic":["miniprog","digi"],"avr":["debug","dapa","reinstall","mib520","avrispmkii","install","mib510","debugopt","eprb","avrisp","avr-studio-debug"],"tinynode":["noflash","gdb","digi","bsl"],"msp":["id","debug","reinstall","install","jtag","debugopt","bsl"],"m16c62p":["debug","sm16cf","reinstall","install","debugopt"],"pxa27x":["debug","reinstall","xflash","install","jflashmm","openocd","debugopt"],"null":["debug"]},"sensorboards":["","nil","mts400","mts300","mda100","im2sb","basicsb","mts300cb"]};</script>
+		-->
+		<h2 class="page-title">TinyOS<span id="tinyos-version"></span></h2>
+		<div style="margin-bottom: 20px;">
+		<!-- DESCRIPTION HERE -->
+			This view gives you the opportunity to compile and program your hardware for the planned wireless sensor network using TinyOS.<br/>
+			<br/>
+			Definitions:
+			<ul>
+				<li>Gateway consist of Server and BaseStation whereas BaseStation is programmed on a sensor node with only forwarding functionality.</li>
+				<li>Nodes are the data collectors within the wireless sensor network. They can be represented by different hardware and support different funtionalities.</li>
+				<li>IP Tunnel is requested for IP communication in order to eliminate unneeded overhead such as IP-header in the packets.</li>
+				<li>Certificates are only required if you want to establish a DTLS secured tunnel connection. Here only for OPAL nodes used as cluster heads.</li>
+				<li>The "Tools" box gives you access to some of the special TinyOS functionalities allowing you to further configure your sensor network.</li>
+			</ul>
+		<!-- ---------------- -->
+		</div>
+		
+		
+		
+		
+		<div id="tinyos" style="display: none;">
+			<div class="no-device-detected" style="display: none; margin-bottom: 15px; color: red; font-weight: bold; font-size: 0.95em; margin-left: 3px;">No USB device detected!</div>
+			<div class="region" style="margin-bottom: 15px;">
+				<div class="title" style="cursor: pointer; border: 1px solid black; border-radius: 3px; background-color: #e4e4e4; padding: 7px 7px 7px 7px;"><h3 style="margin: 0; padding: 0; font-size: 0.95em;"></h3></div>
+				<div class="content" style="display: none; padding: 7px; border: 1px solid black; border-top: 0; border-bottom-left-radius: 3px; border-bottom-right-radius: 3px;">
+					<div>
+						<div class="tinyos_options">
+							<div style="margin-bottom: 20px; width: 60%; float: left;">
+								<table class="table" style="border: 0; font-size: 13px;">
+									<tr>
+										<td style="width: 100px; font-weight: bold; font-size: 0.9em;">Target:</td>
+										<td>
+											<select class="targets">
+											</select>
+										</td>
+									</tr>
+									<tr>
+										<td style="width: 100px; font-weight: bold; font-size: 0.9em;">Sensorboard:</td>
+										<td>
+											<select class="sensorboards">
+											</select>
+										</td>
+									</tr>
+									<tr class="extras">
+										<td class="extras_title" style="width: 10%; vertical-align: top; font-weight: bold; font-size: 0.9em;">Extras:</td>
+										<td>
+											<div class="extra_entries" style="width: 90%;">
+												<div class="extra_entry" style="float: left; width: 150px; white-space: nowrap;">
+													<input type="checkbox"/> <label></label>
+												</div>
+											</div>
+										</td>
+									</tr>
+								</table>
+								<div style="width: 100%; margin-top: 30px;">
+									<div style="margin-bottom: 10px;">
+										<table>
+											<tr>
+												<td style="vertical-align: middle; font-weight: bold; font-size: 0.9em;"><div style="">Directory: </div></td>
+												<td><select class="directories"></select></td>
+												<td><input class="directory" type="text" style="width: 567px;" readonly="readonly" /></td>
+											</tr>
+										</table>
+									</div>
+									<div>
+										<div style="float: left; width: 10%;">
+											<span style="height: 24px;">
+												<input class="domake" type="button" style="width: 60px; height: 24px;" value="make" />
+												<img class="make" src="/tinyos/img/wait.gif" style="display: none; position: relative; top: 3px; right: 1px; "/>
+											</span>
+										</div>
+										<input class="make" type="text" style="float: right; width: 90%; padding: 5px; height: 24px; padding-top: 2px; padding-bottom: 2px;" value="" />
+									</div>
+									<div style="position: relative; top: 25px;">
+										<div style="width: 90%;">
+											<div style="margin-left: 100px; position: relative; top: -12px;">
+												<span class="programmer" style="display: none; height: 24px; font-weight: bold; font-size: 0.9em;">
+													Programmer: <select class="programmers"><option value="mib510">mib510</option></select>
+												</span>
+												<span style="height: 24px; font-weight: bold; font-size: 0.9em;">
+													Device: <select class="devices"></select>
+												</span>
+												<span style="height: 24px; font-weight: bold; font-size: 0.9em;">
+													nodeID: <input class="nodeid" type="text" style="width: 75px; text-align: right;" />
+												</span>
+											</div>
+										</div>
+										<div>
+											<div style="float: left; width: 10%;">
+												<span style="height: 24px;">
+													<input class="domake_install" type="button" style="width: 60px; height: 24px;" value="install" />
+													<img class="make_install" src="/tinyos/img/wait.gif" style="display: none; position: relative; top: 3px; right: 1px; "/>
+												</span>
+											</div>
+											<input class="make_install" type="text" style="float: right; width: 90%; padding: 5px; height: 24px; padding-top: 2px; padding-bottom: 2px;" value="" />
+										</div>
+									</div>
+									<textarea class="exec_content" style="background-color: white; overflow-y: scroll; overflow-x: hidden; border: 1px solid gray; height: 200px; width: 100%; margin-top: 28px;">
+									</textarea>
+									<div class="compilation-info" style="display: none;">
+										<div style="float: left; margin-right: 50px;"><span style="font-weight: bold;">ROM needed:</span> <span class="rom"></span> bytes</div>
+										<div style="float: left;"><span style="font-weight: bold;">RAM needed:</span> <span class="ram"></span> bytes</div>
+										<div style="clear: both;"></div>
+									</div>
+								</div>
+							</div>
+							<div style="width: 35%; float: left; padding-left: 30px;">
+								<div style="font-weight: bold;">Information:</div>
+								<div style="padding-left: 10px;">
+								
+								
+								
+								
+									
+									<!-- ADD PROGRAMMING INFORMATION HERE -->
+									<div>
+										<DL>
+										  <DT><b>1. Specify your hardware and code:</b>
+										  <DD>
+										  	<div style="margin-bottom: 10px;">
+											  	<ul>
+											  		<li><b>Target:</b> Decide which platform you are using (e.g. <em>IRIS</em>)</li>
+											  		<li><b>Sensorboard:</b> Decide which sensor board is used for your platform if it is used (e.g. <em>IRIS</em> - <em>mts300cb</em>)</li>
+											  		<li><b>Extras:</b> Choose extra components, e.g. support for the Internet-Protocol by using <em>BLIP</em></li>
+											  		<li><b>Directory:</b> Choose the Software to use for your nodes</li>
+											  	</ul>
+											  	<div>--&gt; Now press the "make" button in order to compile the program code for your hardware</div>
+										  	</div>
+										
+										  <DT><b>2. Install the program code to your hardware:</b>
+										  <DD>
+										  	<div style="margin-bottom: 10px;">
+										  		<ul>
+										  			<li><b>Device:</b> Choose the port (like USB0, USB1..) the node to program is plugged in.</li>
+										  			<li><b>nodeID:</b> the ID of your node, should be unique throughout the whole network!</li>
+										  		</ul>
+										  		<div>--&gt; Now press the "install" button</div>
+										  	</div>
+										
+										</DL>
+										
+										<div style="font-weight: bold; margin-top: 5px;">Further Hints:</div>
+										<ul>
+											<li>
+												BaseStations should get programmed with Sensorboard=nil
+											</li>
+										</ul>
+									</div>
+									<div style="margin-top: 20px;">
+										<table style="border: 1px solid black; font-size: 0.9em;">
+											<tr>
+												<th style="padding: 2px 5px; border-right: 1px solid black; border-bottom: 1px solid black;">Target</th>
+												<th style="padding: 2px 5px; border-right: 1px solid black; border-bottom: 1px solid black;">Sensorboard</th>
+												<th style="padding: 2px 5px; border-right: 1px solid black; border-bottom: 1px solid black;">Directory</th>
+												<th style="padding: 2px 5px; border-bottom: 1px solid black;">Functionality</th>
+											</tr>
+											<tr>
+												<td style="padding: 2px 5px; border-right: 1px solid black;">IRIS</td>
+												<td style="padding: 2px 5px; border-right: 1px solid black;">mtsc300cb</td>
+												<td style="padding: 2px 5px; border-right: 1px solid black;">Data Collector</td>
+												<td style="padding: 2px 5px;">Data Collector only - light/sound or temperature/sound</td>
+											</tr>
+										</table>
+									</div>
+									<!-- -------------------------------- -->
+									
+									
+									
+									
+									
+								</div>
+							</div>
+							<div style="clear: both;"></div>
+						</div>
+						<div class="tunnel">
+							<div class="closed_unexpectedly" style="margin-top: 5px; color: red; font-weight: bold; display: none;">
+								Tunnel closed unexpectedly!
+							</div>
+							<div style="margin-top: 5px;">
+								<div style="float: left; width: 100px;">
+									<span style="height: 24px;">
+										<input class="do" type="button" style="width: 60px; height: 24px;" value="start" />
+										<img class="wait" src="/tinyos/img/wait.gif" style="display: none; position: relative; top: 3px; right: 1px; "/>
+									</span>
+								</div>
+								<div style="height: 24px; font-weight: bold; font-size: 0.9em;">
+									<span style="margin-right: 10px;">sudo password: <input class="password" type="password" name="password" style="width: 100px;" /></span>
+									<span style="margin-right: 10px;">Target: <select class="targets"></select></span>
+									<span style="margin-right: 10px;">Device: <select class="devices"></select></span>
+								</div>
+							</div>
+							<div>
+								<textarea class="exec_content" style="background-color: white; overflow-y: scroll; overflow-x: hidden; border: 1px solid gray; height: 200px; width: 100%; margin-top: 10px;">
+								</textarea>
+							</div>
+						</div>
+						
+						
+						
+						<div class="tools">
+							<div class="tool-meta">
+								<div class="tool">
+									<input class="button" type="button" /> <img class="wait" src="/tinyos/img/wait.gif" style="display: none; position: relative; top: 3px; right: 1px; "/> <span class="status"></span>
+								</div>
+							</div>
+							<div style="margin-top: 20px;">
+								<hr/>
+								<div class="blip-stats">
+									<div style="font-weight: bold; ">BLIP - Stats:</div>
+									<div>
+										<input type="button" class="blip-stats-button" value="fetch stats" /> <img class="wait" src="/tinyos/img/wait.gif" style="display: none; position: relative; top: 3px; right: 1px; "/> <span class="status"></span><br/>
+										<textarea class="blip-stats-text" style="width: 100%; height: 200px; border: 1px solid black;">
+											asdf
+										</textarea>
+									</div>
+								</div>
+							</div>
+						</div>
+						
+						
+						
+						<div class="certificates">
+						
+						
+						
+							
+							<!-- ADD CERTIFICATE INFORMATION HERE -->
+							How to gen Certificates..
+							<!-- -------------------------------- -->
+							
+							
+							
+							
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div id="tinyos-notfound" style="display: none;">
+			TinyOS installation not found.
+		</div>
+		
+		<script type="text/javascript">
+		/*
+		 * required vars:
+		 * 		tinyos = {
+		 *		 	running: true|false,
+		 *		 	version: version,
+		 *		 	directories: {category: [directory]},
+		 *		 	devices: [device]
+		 *			target_platforms: {category: [platform]},
+		 *			make_extras: {catgeroy: [extra]},
+		 *			sensorboards: [sensorboard]
+		 *		}
+		 */
+
+
+		$(function() {
+			
+			/* create templates */
+			var extrasTpl = create_template($(".make_extras"));
+			var platformsTpl = create_template($(".target_platforms"));
+			var tunnelTpl = create_template($(".tunnel"), function() {
+			
+					var _this=this;
+					
+					for (category in tinyos.target_platforms) {
+						for (var i=0; i<tinyos.target_platforms[category].length; i++) {
+							var target = tinyos.target_platforms[category][i];
+						
+							_this.el.find("select.targets").append(
+								"<option value=\""+target.replace("\"","\\\"")+"\" "+(target=="telosb"?"selected=\"selected\"":"")+">"+(category!=""?"("+category+") ":"")+target+"</option>"
+							);
+						}
+					}
+					
+					if (tinyos.devices != null)
+					for (var i=0; i<tinyos.devices.length; i++) {
+						var device = tinyos.devices[i];
+						
+						this.el.find("select.devices").append(
+							"<option value=\""+device.replace("\"","\\\"")+"\">"+device+"</option>"
+						);
+					}
+					
+					this.el.find("input.do").click(function(eve) {
+						_this.startTunnel();
+					});
+					this.el.find("input.password").keypress(function(eve) {
+						if (eve.keyCode == "13") {
+							_this.startTunnel();
+						}
+					});
+					
+					if (tinyos.tunnelsRunning) {
+						this.continueTunnel();
+					}
+				},
+				{
+					continueTunnel: function() {
+						this.el.find(".exec_content").val(tinyos.tunnelsRunning);
+						this.startTunnel(true);
+					},
+					startTunnel: function(cont) {
+						var _this=this;
+						
+						this.stopexec();
+						this.executing = {interval: null, requesting: false};
+						this.el.find(".closed_unexpectedly").hide();
+						
+						if (!cont) {
+							var pw = this.el.find("input.password").val();
+							var device = this.el.find("select.devices").val();
+							var target = this.el.find("select.targets").val();
+							
+							this.el.find(".exec_content").val("");
+							$.ajax({
+								"url": "/tinyos/dotunnel",
+								data: {"pw": pw, "device": device, "target": target},
+								context: this,
+								dataType: "json",
+								success: function(data) {
+
+									this.appendText(data.text);
+									if (this.executing==null) return;
+									
+									this.tracktunnel();
+								},
+								error: function() {
+									//this.stopexec(true);
+								},
+								complete: function() {
+								}
+							});
+						} else {
+							this.tracktunnel();
+						}
+						
+						this.el.find("img.wait").show();
+						this.el.find("input.do")
+								.val("stop")
+								.unbind("click")
+								.click(function(eve){
+									_this.stopexec();									
+								});
+					},
+					
+					tracktunnel: function() {
+						if (this.executing==null) return;
+						
+						var _this=this;
+						window.clearInterval(this.executing.interval);
+						
+						this.executing.interval = window.setInterval(function() {
+							if (_this.executing==null || _this.executing.requesting) return;
+									
+							_this.executing.requesting=true;
+							$.ajax({
+								"url": "/tinyos/updateexec",
+								"data": {"category": "tunnel"},
+								"dataType": "json",
+								success: function(data){
+									if (_this.executing==null) return;
+									_this.executing.requesting=false;
+											
+									_this.appendText(data.text);
+									if (data.finished) {
+										//_this.stopexec(true);
+									}
+								},
+								//error: function(){_this.stopexec(true);},
+							});
+						}, 500);
+					},
+					
+					stopexec: function(unexpected) {
+						if (this.executing == null) return;
+						
+						if (unexpected) {
+							//this.el.find(".closed_unexpectedly").show();
+						}
+						
+						var _this=this;
+						this.el.find("img.wait").hide();
+						this.el.find("input.do")
+								.val("start")
+								.unbind("click")
+								.click(function(eve){
+									_this.startTunnel();									
+								});
+								
+						$.ajax({
+							"url": "/tinyos/abortexec",
+							data: {"category": "tunnel"},
+							context: this,
+							success: function(data) {
+							},
+							error: function() {
+							},
+							complete: function() {
+							}
+						});
+								
+						this.executing=null;
+					},
+					
+					appendText: function(text) {
+						if (text==null || text=="") return;
+
+						var pcntg = get_scroll_pcntg(this.el.find(".exec_content").get(0));
+						var scroll = pcntg!=null && pcntg<1 ? $(".exec_content").scrollTop() : null;
+
+						this.el.find(".exec_content").val(this.el.find(".exec_content").val()+text);
+						this.el.find(".exec_content").scrollTop(scroll!=null ? scroll : this.el.find(".exec_content").get(0).scrollHeight);
+					}
+				}
+			);
+			var optionsTpl = create_template($(".tinyos_options"), function(optionsCategory) {
+
+					var _this=this;
+					this.category = optionsCategory;
+					
+					/* create sub templates */
+					extrasTpl = create_template(this.el.find(".extras"), function(extrasCategory, optionsCategory) {
+
+						// extract entry
+						extraEntryTpl = create_template(this.el.find(".extra_entry"), function(extra, extrasCategory, optionsCategory) {
+
+							this.el.find("input")
+								.attr("id", optionsCategory+"_"+extrasCategory+"_extra_"+extra)
+								.attr("name", optionsCategory+"_"+extrasCategory+"_extra")
+								.attr("value", extra);
+							this.el.find("label")
+								.attr("for", optionsCategory+"_"+extrasCategory+"_extra_"+extra)
+								.text(extra);
+						});
+						
+						
+						// popuplate
+						this.el.addClass("extra_"+extrasCategory);
+						this.el.find(".extras_title").text((extrasCategory!="" ? "\""+extrasCategory+"\" " : "") + this.el.find(".extras_title").text());
+
+						if (tinyos.make_extras[extrasCategory] != null)
+						for (var i=0; i<tinyos.make_extras[extrasCategory].length; i++) {
+							var extra = tinyos.make_extras[extrasCategory][i];
+							
+							var entry = new extraEntryTpl(extra, extrasCategory, optionsCategory);
+							if (extra == "blip") {
+								entry.el.find("input").attr("checked","checked");
+							}
+							entry.appendTo(this.el.find(".extra_entries"));
+						}
+					});
+					
+					
+					/* populate */
+					_this.el.find("select.targets").attr("name", optionsCategory+"_targetsSelect");
+					_this.el.find("select.sensorboards").attr("name", optionsCategory+"_sensorboardsSelect");
+					_this.el.find("select.directories").attr("name", optionsCategory+"_directories");
+					_this.el.find("input.directory").attr("name", optionsCategory+"_directory");
+					_this.el.find("input.domake").click(function() {_this.exec("make")});
+					_this.el.find("input.domake_install").click(function() {_this.exec("make_install")});
+					
+					// targets
+					for (category in tinyos.target_platforms) {
+						for (var i=0; i<tinyos.target_platforms[category].length; i++) {
+							var target = tinyos.target_platforms[category][i];
+						
+							_this.el.find("select.targets").append(
+								"<option value=\""+target.replace("\"","\\\"")+"\" "+(target=="telosb"?"selected=\"selected\"":"")+">"+(category!=""?"("+category+") ":"")+target+"</option>"
+							);
+						}
+					}
+					_this.el.find("select.targets").change(function(eve){
+						if ($(this).val().trim()=="iris")
+							_this.el.find(".programmer").show();
+						else
+							_this.el.find(".programmer").hide();
+						_this.updateMakeCommand();
+					});
+					_this.el.find(".programmers").change(function(){_this.updateMakeCommand()});
+					
+					// sensorboards
+					var sensorboardHints = {
+						"": ["(default)","(TelosB all active)"],
+						"nil": " (no sensorboard)",
+						
+						"mts300cb": " (IRIS)",
+						"mts400": " (IRIS)"
+					};
+					for (var i=0; i<tinyos.sensorboards.length; i++) {
+							var sensorboard = tinyos.sensorboards[i];
+
+							var labels = [sensorboard]; // default						
+							if (sensorboardHints[sensorboard] != null) {
+								if (sensorboardHints[sensorboard] instanceof Array) {
+									labels = [];
+									for (var j=0; j<sensorboardHints[sensorboard].length; j++) {
+										labels.push(sensorboard + sensorboardHints[sensorboard][j]);
+									}
+								} else {
+									labels[0] += sensorboardHints[sensorboard];
+								}
+							}
+							
+							for (var j=0; j<labels.length; j++) {
+								_this.el.find("select.sensorboards").append(
+									"<option value=\""+sensorboard.replace("\"","\\\"")+"\" "+(sensorboard==""?"selected=\"selected\"":"")+">"+labels[j]+"</option>"
+								);
+							}
+					}
+					_this.el.find("select.sensorboards").change(function(eve){_this.updateMakeCommand()});
+					
+					// make extras
+					var entry = new extrasTpl("", optionsCategory);
+					entry.appendTo(this.el.find(".table"));
+					this.el.find(".table").delegate("input", "change", function(eve){_this.updateMakeCommand()});
+					
+					// directories
+					if (tinyos.directories[optionsCategory] != null) {
+						var firstVal=null;
+						for (var name in tinyos.directories[optionsCategory]) {
+							var directory = tinyos.directories[optionsCategory][name];
+							if (firstVal==null) firstVal = directory;
+							
+							this.el.find("select.directories").append(
+								"<option value=\""+directory.replace("\"", "\\\"")+"\">"+name+"</option>"
+							);
+						}
+						if (firstVal!=null)
+							_this.el.find("input[name=\""+optionsCategory.replace("\"","\\\"")+"_directory"+"\"]").val(firstVal);
+					}
+					this.el.find("select.directories").append(
+						"<option value=\"\">------------------ other ------------------</option>"
+					);
+					this.el.find("select.directories").change(function(eve){
+						_this.el.find("input[name=\""+optionsCategory.replace("\"","\\\"")+"_directory"+"\"]")
+								.val($(this).val())
+								.attr("readonly", $(this).val()!="" ? "readonly" : false);
+					});
+					
+
+					// command input
+					this.el.find("select.devices").attr("name", optionsCategory.replace("\"","\\\"")+"_devices").change(function(){_this.updateMakeCommand()});
+					this.el.find("input.nodeid").attr("name", optionsCategory.replace("\"","\\\"")+"_nodeid").keyup(function(){
+						var val = parseInt($(this).val());
+						if (isNaN(val))
+							val = "";
+						
+						$(this).val(val);
+						_this.updateMakeCommand();
+					});
+					
+					if (tinyos.devices != null)
+					for (var i=0; i<tinyos.devices.length; i++) {
+						var device = tinyos.devices[i];
+						
+						this.el.find("select.devices").append(
+							"<option value=\""+device.replace("\"","\\\"")+"\">"+device+"</option>"
+						);
+					}
+					
+					this.updateMakeCommand();
+					
+					
+					/* bind events */
+					this.el.find("select.targets").change(function(eve) {
+						_this.el.find("tr.extras").each(function() {
+							if (!$(this).hasClass("extra_")) {
+								$(this).remove();
+							}
+						})
+						
+						if (tinyos.make_extras[$(this).val()] != null) {
+							var entry = new extrasTpl($(this).val(), optionsCategory);
+							entry.appendTo(_this.el.find(".table"));
+						}
+					});
+				},
+				
+				{
+					updateMakeCommand: function() {
+						// assemble
+						var makecmd = "make " + this.el.find("select.targets").val();
+						var makeinstallcmd = makecmd
+												+ " reinstall"
+												+ (this.el.find("input.nodeid").val().trim()!="" ? "."+this.el.find("input.nodeid").val().trim() : "")
+												+ (this.el.find("select.devices").val()!=null
+														? " " + (this.el.find(".programmer").css("display").toLowerCase()!="none" && this.el.find("select.programmers").val().trim()!="" ? this.el.find("select.programmers").val().trim()+".":"") + " bsl," + this.el.find("select.devices").val().trim().replace("\"","\\\"")
+														: "");
+						
+						if (this.el.find("select.sensorboards").val().trim()!="") {
+							makecmd = "SENSORBOARD=" + this.el.find("select.sensorboards").val().trim() + " " + makecmd;
+						}
+						
+						this.el.find("input:checkbox:checked").each(function() {
+							makecmd += " " + $(this).val();
+							makeinstallcmd += " " + $(this).val();
+						});
+						
+						// output
+						this.el.find("input.make").val(makecmd);
+						this.el.find("input.make_install").val(makeinstallcmd);
+					},
+					
+					exec: function(type) {
+						if (type != "make" && type != "make_install") return;
+						this.el.find(".compilation-info").hide();
+						
+						var _this=this;
+						var cmd = this.el.find("input."+type).val();
+						var dir = this.el.find("input.directory").val();
+						var category = this.category;
+						
+						this.stopexec();
+						this.executing = {"type": type, "interval": null, "requesting": false, "label": this.el.find("input.do"+type).val()};
+						this.el.find("input.do"+type).val("stop").unbind("click").click(function(eve) {
+							_this.stopexec();
+						});
+						if (type == "make") this.el.find("input.domake_install").attr("disabled","disabled");
+						else this.el.find("input.domake").attr("disabled","disabled");
+						
+						
+						this.el.find("img." + type).show();
+						this.el.find(".exec_content").val("");
+						$.ajax({
+							"url": "/tinyos/domake",
+							data: {"cmd": cmd, "dir": dir, "category": category},
+							context: this,
+							dataType: "json",
+							success: function(data) {
+
+								this.appendText(data.text);
+								if (this.executing==null) return;
+								
+								this.executing.interval = window.setInterval(function() {
+									if (_this.executing==null || _this.executing.requesting) return;
+									
+									_this.executing.requesting=true;
+									$.ajax({
+										"url": "/tinyos/updateexec",
+										"data": {"category": category},
+										"dataType": "json",
+										success: function(data){
+											_this.appendText(data.text);
+											if (data.finished) {
+												_this.stopexec();
+											}
+											if (_this.executing!=null)
+												_this.executing.requesting=false;
+										},
+										error: function(){_this.stopexec();},
+									});
+								}, 500);
+							},
+							error: function() {
+								this.stopexec();
+							},
+							complete: function() {
+							}
+						});
+						
+					},
+					
+					stopexec: function() {
+						if (this.executing==null) return;
+
+						var _this=this;
+						
+						window.clearInterval(this.executing.interval);
+						
+						var type = this.executing.type;
+						this.el.find("img."+this.executing.type).hide();
+						this.el.find("input.do"+this.executing.type)
+									.val(this.executing.label)
+									.unbind("click")
+									.click(function(eve) {
+										_this.exec(type);
+									});
+						this.el.find("input.domake").removeAttr("disabled");
+						this.el.find("input.domake_install").removeAttr("disabled");
+						
+						$.ajax({
+							"url": "/tinyos/abortexec",
+							data: {"category": this.category},
+							context: this,
+							success: function(data) {
+							},
+							error: function() {
+							},
+							complete: function() {
+							}
+						});
+						
+						this.executing = null;
+						
+						
+						// extract info
+						var output = this.el.find(".exec_content").val();
+						var rom = output.match(/(\d+) bytes in ROM/);
+						var ram = output.match(/(\d+) bytes in RAM/);
+						
+						if (rom!=null && rom.length > 1 && ram!=null && ram.length > 1) {
+							this.el.find(".compilation-info .rom").text(rom[1]);
+							this.el.find(".compilation-info .ram").text(ram[1]);
+							this.el.find(".compilation-info").show();
+						}
+					},
+					
+					appendText: function(text) {
+						if (text==null || text=="") return;
+						
+						var scroll = this.el.find(".exec_content").scrollTop()!=this.el.find(".exec_content").get(0).scrollHeight ? this.el.find(".exec_content").scrollTop() : null;
+						this.el.find(".exec_content").val(this.el.find(".exec_content").val()+text);
+						this.el.find(".exec_content").scrollTop(scroll!=null ? scroll : this.el.find(".exec_content").get(0).scrollHeight);
+					}
+				}
+			);
+			var toolsTpl = create_template($(".tools"), function(toolslist) {
+
+				var toolTpl = create_template(this.el.find(".tool"), function(tool) {
+					var _this=this;
+					
+					// assemble button tools
+					this.el.find(".button")
+						.val(tool.name)
+						.click(function() {
+							_this.el.find(".wait").show();
+							
+							$.ajax({
+								"url": "/tinyos/"+tool.action,
+								data: {"category": this.category},
+								dataType: "json",
+								context: this,
+								success: function(data) {
+									_this.el.find(".wait").hide();
+									
+									if (data.success)
+										_this.el.find(".status").text("done" + (data.msg!=null?data.msg:""));
+									else 
+										_this.el.find(".status").text("error: " + data.msg);
+								},
+								error: function() {
+									_this.el.find(".wait").hide();
+									_this.el.find(".status").text("error");
+								},
+								complete: function() {
+								}
+							}
+						);
+					});
+				});
+				
+				for (var i=0; i<toolslist.length; i++) {
+					var entry = new toolTpl(toolslist[i]);
+					entry.appendTo(this.el.find(".tool-meta"));
+				}
+				
+				// assemble stats tool
+				var _this = this;
+				this.el.find(".blip-stats .blip-stats-button").click(function(eve) {
+					_this.el.find(".blip-stats .wait").show();
+					$.ajax({
+						"url": "/tinyos/blipstats",
+						dataType: "json",
+						context: this,
+						success: function(data) {
+							_this.el.find(".blip-stats .wait").hide();
+							
+							if (data.success) {
+								_this.el.find(".blip-stats .status").text("done");
+								_this.el.find(".blip-stats .blip-stats-text").val((data.msg!=null?data.msg:""));
+							}
+							else 
+								_this.el.find(".blip-stats .status").text("error: " + data.msg);
+						},
+						error: function() {
+							_this.el.find(".blip-stats .wait").hide();
+							_this.el.find(".blip-stats .status").text("error");
+						},
+						complete: function() {
+						}
+					});
+				});
+			});
+			var certificatesTpl = create_template($(".certificates"), function() {
+				
+			});
+			var regionTpl = create_template($(".region"), function(regionName) {
+				
+				var _this=this;
+				if (this.tpl.instances==null) this.tpl.instances=[];
+				this.tpl.instances.push(this);
+
+				// constructor
+				this.el.find(".title h3").text(regionName);
+				
+				// event bindings
+				this.el.find(".title").click(function(eve) {
+					// close other regions
+					for (var i=0; i<_this.tpl.instances.length; i++) {
+						if (_this.tpl.instances[i] != _this) {
+							_this.tpl.instances[i].collaps();
+						}
+					}
+					
+					// expand / collaps this region
+					if (!_this.expanded) {
+						_this.expand();
+					} else {
+						_this.collaps();
+					}
+				});
+			},
+			{
+				expand: function() {
+					this.expanded = true;
+					this.el.find(".content").show();
+					this.el.find(".title").css("border-bottom-right-radius", "0px").css("border-bottom-left-radius", "0px");
+				}, 
+				collaps: function() {
+					this.expanded = false;
+					this.el.find(".content").hide();
+					this.el.find(".title").css("border-bottom-right-radius", "").css("border-bottom-left-radius", "");
+				}
+			});
+
+			
+			/* do stuff */
+			if (tinyos.running) {
+				
+				
+				$("#tinyos").show();
+				$("#tinyos-version").text("-"+tinyos.version);
+				if (tinyos.devices==null || tinyos.devices.length<=0)
+					$(".no-device-detected").show();
+				
+				var BaseStationRegion = new regionTpl("Program BaseStation");
+				(new optionsTpl("base_station")).appendTo(BaseStationRegion.el.find(".content"));
+				BaseStationRegion.appendTo($("#tinyos"));
+
+				var NodesRegion = new regionTpl("Program Nodes");
+				(new optionsTpl("nodes")).appendTo(NodesRegion.el.find(".content"));
+				NodesRegion.appendTo($("#tinyos"));
+
+				var TunnelRegion = new regionTpl("IP Tunnel");
+				(new tunnelTpl()).appendTo(TunnelRegion.el.find(".content"));
+				TunnelRegion.appendTo($("#tinyos"));
+				if (tinyos.tunnelsRunning)
+					TunnelRegion.expand();
+				
+				var CertificatesRegion = new regionTpl("Certificates");
+				(new certificatesTpl()).appendTo(CertificatesRegion.el.find(".content"));
+				CertificatesRegion.appendTo($("#tinyos"));
+
+				var ToolsRegion = new regionTpl("Tools");
+				(new toolsTpl([{name: "rebuild topology", action: "rebuildtopology"},{name: "blip console", action: "blipconsole"}])).appendTo(ToolsRegion.el.find(".content"));
+				ToolsRegion.appendTo($("#tinyos"));
+			} else {
+				$("#tinyos-notfound").show();
+			}
+		});
+		</script>
+	</body>
+</html>

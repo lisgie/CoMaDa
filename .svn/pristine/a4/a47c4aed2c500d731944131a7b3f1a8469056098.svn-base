@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+	<body>
+		<h2 class="page-title">Protocol Packet Data</h2>
+		
+		
+		<div style="height: 100%;">
+			<div class="left" style="float: left; width: 40%;">
+			
+			
+				<widget:protocols></widget:protocols>
+				
+				
+				
+			</div>
+			<div style="float: left;  width: 60%;">
+				<div>
+					<select class="widget">
+					</select>
+					<script type="text/javascript">
+					for (var w in widgets) {
+						$(".widget").append($("<option value='"+w+"' "+(w=="widget:topology"?"selected=selected":"")+">"+w+"</option>"));
+					}
+					$(".widget").change(function(eve) {
+						var widget = $(".widget").val();
+						$(".right").empty().html("<"+widget+"></"+widget+">");
+						angular.bootstrap($(".right"), ["wsnApp"]);
+//						$(".right").empty().append(angular.element("<"+widget+"></"+widget+">"));
+					});
+					</script>
+				</div>
+				
+				<div class="right" style="padding-left: 20px;">
+					<widget:topology></widget:topology>
+				</div>
+			</div>
+			<div style="clear: both;"></div>
+		</div>
+		
+	</body>
+</html>

@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<style type="text/css">
+			#module_entries .hasLink {
+				border-style: solid !important;
+			}
+			#module_entries .hasLink .module:hover {
+				text-decoration: underline;
+			}
+		</style>
+	</head>
+	
+	<body>
+		<h2 class="page-title">Measurement-Unit-Translations</h2>
+		
+		<div class="successfully-saved" style="display: none;">
+			<div style="border: 1px solid green; padding: 5px; font-weight: bold; color: green; margin-bottom: 10px; float: left;">Translations successfully saved!</div>
+			<div style="clear: both;"></div>
+		</div>
+		
+		
+		<div class="unit-translations">
+			<div style="font-weight: bold;">You can tell the System to translate specific Node-Data into different Units before processing it, by selecting some of the options below..</div>
+			
+			<form method="POST" action="/settings/units">
+				<div class="unitTypes">
+					<div class="unitType" style="margin-top: 20px; border: 1px dashed black; padding: 7px 10px 15px 10px;">
+						<div class="title" style="font-weight: bold; text-decoration: underline;"></div>
+						<div style="padding-left: 15px; padding-top: 10px; font-size: 0.85em;">
+							<div style="float: left; border: 1px dotted black;">
+								<div style="margin-top: 0px; padding: 3px 5px 5px 5px; border-bottom: 1px dotted black;">
+										<span style="">Prefered Unit:</span>
+										<span class="defaults">
+											<span class="default" style="padding-right: 5px; cursor: pointer;">
+												<input id="" class="checkbox" type="checkbox" style="cursor: pointer;"/>
+												<label for="" class="label"></label>
+											</span>
+										</span>
+										<span>(changes all values below)</span>
+								</div>
+								<div class="options" style="font-size: 0.9em; padding: 5px 10px 5px 19px;">
+									<span class="option" style="padding-right: 5px;">
+										<span class="unit"></span>
+										-&gt;
+										<select name="" class="option-options">
+											<option value="">-no translation-</option>
+											<option value="" class="option-option"></option>
+										</select>
+									</span>
+								</div>
+							</div>
+							<div style="clear: both;"></div>
+						</div>
+					</div>
+				</div>
+				<div style="margin-top: 10px;">
+					<input type="submit" value="save" />
+				</div>
+			</form>
+			
+			<script type="text/javascript">
+			/** vars:
+					availableTranslations =
+						{
+							unitType: {
+								originalUnit: [
+								     {
+								    	 unitType: unitType,
+								    	 originalUnit: ..,
+								    	 destinationUnit: ..
+								     }
+								]
+							}						
+						}
+			
+					activeTranslations =
+						unitType: {
+							{
+								originalUnit: destinationUnit
+							}
+						}
+			*/
+			unitTypeTpl = create_template($(".unitTypes .unitType"), function(unitType, translations) {
+				var defaultEntryTpl = create_template(this.el.find(".default"), function(unitType, originalUnit, destinationUnit) {
+					var id = "setUnitTranslationsDefault["+unitType+"]["+destinationUnit+"]";
+
+					this.el.find(".label").attr("for", id).text(destinationUnit);
+					this.el.find(".checkbox").attr("id", id);
+					this.el.find(".checkbox").bind("click", {unitType: unitType, destinationUnit: destinationUnit}, function(eve) {
+						if (unitTypeEntries[eve.data.unitType] == null) return;
+						
+						unitTypeEntries[eve.data.unitType].selectDefault(eve.data.destinationUnit);
+					});
+				});
+				var optionEntryTpl = create_template(this.el.find(".option"), function(unitType, translations) {			
+					var optionOptionEntryTpl = create_template(this.el.find(".option-option"), function(unitType, originalUnit, destinationUnit) {
+						this.el.attr("value", destinationUnit).text(destinationUnit);
+						if (activeTranslations[unitType]!=null && activeTranslations[unitType][originalUnit]==destinationUnit) {
+							this.el.attr("selected", "selected");
+						}
+					});
+
+					if (translations.length <= 0) return;
+
+					this.originalUnit = translations[0].originalUnit;
+					this.optionOptions = {};
+					
+					this.el.find(".unit").text(translations[0].originalUnit);
+					this.el.find(".option-options").attr("name", "setUnitTranslations["+unitType+"]["+translations[0].originalUnit+"]");
+					
+					for (var i=0; i<translations.length; i++) {
+						var optionOptionEntry = new optionOptionEntryTpl(translations[i].unitType, translations[i].originalUnit, translations[i].destinationUnit);
+						optionOptionEntry.appendTo(this.el.find(".option-options"));
+						
+						this.optionOptions[translations[i].destinationUnit] = optionOptionEntry;
+					}
+					
+					this.el.find("select").bind("change", {unitType: unitType}, function(eve) {
+						unitTypeEntries[eve.data.unitType].updateDefaultSelection();
+					});
+				}, {
+					originalUnit: null,
+					optionOptions: null,
+					
+					selectOption: function(destinationOption) {
+						if (this.optionOptions[destinationOption] == null && destinationOption!=this.originalUnit) return;
+
+						// deselect other optionoptions
+						for (var optionOption in this.optionOptions) {
+							this.optionOptions[optionOption].el.removeAttr("selected");
+						}
+						
+						// select new option
+						if (destinationOption != this.originalUnit) {
+							this.optionOptions[destinationOption].el.attr("selected", "selected");
+						} else {
+							this.el.find("select option[value=\"\"]").attr("selected", "selected");
+						}
+					},
+					getSelectedOption: function() {
+						return this.el.find("select").val();
+					}
+				});
+				
+				this.unitType = unitType;
+				this.defaultOptions = {};
+				this.options = {};
+				
+				// set title
+				this.el.find(".title").text(unitType);
+
+				for (var originalUnit in translations) {
+					// set defaults
+					for (var i=0; i< translations[originalUnit].length; i++) {
+						var destinationUnit = translations[originalUnit][i].destinationUnit;
+						
+						if (this.defaultOptions[destinationUnit] == null) {
+							var defaultEntry = new defaultEntryTpl(unitType, originalUnit, destinationUnit);
+							defaultEntry.appendTo(this.el.find(".defaults"));
+							
+							this.defaultOptions[destinationUnit] = defaultEntry;
+						}
+					}
+					
+					// set options
+					var optionEntry = new optionEntryTpl(unitType, translations[originalUnit]);
+					optionEntry.appendTo(this.el.find(".options"));
+					
+					this.options[originalUnit] = optionEntry;
+				}
+				this.updateDefaultSelection();
+			}, {
+				unitType: null,
+				defaultOptions: null,
+				options: null,
+				
+				selectDefault: function(destinationUnit) {
+					if (this.defaultOptions[destinationUnit] == null) return;
+
+					// deselect other default options
+					for (var defOpt in this.defaultOptions) {
+						this.defaultOptions[defOpt].el.find(".checkbox").removeAttr("checked");
+					}
+					
+					// select new default option
+					this.defaultOptions[destinationUnit].el.find(".checkbox").attr("checked", "checked");
+					
+					// select options
+					for (var ou in availableTranslations[this.unitType]) {
+						this.options[ou].selectOption(destinationUnit);
+					}
+				},
+				
+				updateDefaultSelection: function() {
+					
+					var origCanBeTranslatedTo = {};
+					for (var originalUnit in availableTranslations[this.unitType]) {
+						origCanBeTranslatedTo[originalUnit] = {};
+						
+						for (var i=0; i<availableTranslations[this.unitType][originalUnit].length; i++) {
+							origCanBeTranslatedTo[originalUnit][availableTranslations[this.unitType][originalUnit][i].destinationUnit] = true;
+						}
+					}
+					
+					for (var destinationUnit in this.defaultOptions) {
+						
+						var checked=true;
+						var atLeastOne=false;
+						for (var option in this.options) {
+							if (origCanBeTranslatedTo[this.options[option].originalUnit][destinationUnit] != null) {
+								atLeastOne=true;
+								checked = checked && this.options[option].getSelectedOption()==destinationUnit;
+							}
+						}
+						
+						if (checked && atLeastOne) {
+							this.defaultOptions[destinationUnit].el.find(".checkbox").attr("checked", "checked");
+						} else {
+							this.defaultOptions[destinationUnit].el.find(".checkbox").removeAttr("checked");
+						}
+					}
+				}
+				
+			});
+			
+			var unitTypeEntries={};
+			$(function() {
+				if (typeof(success) !== 'undefined') {
+					$(".successfully-saved").show();
+				}
+				
+				for (var unitType in availableTranslations) {
+					
+					var entry = new unitTypeTpl(unitType, availableTranslations[unitType]);
+					entry.appendTo($(".unitTypes"));
+					
+					unitTypeEntries[unitType] = entry;
+				}
+			});
+			</script>
+		</div>
+	</body>
+</html>

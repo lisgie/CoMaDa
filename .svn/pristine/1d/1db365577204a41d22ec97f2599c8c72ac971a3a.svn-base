@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+	<body>
+		<link href="../index/css/contiki.css" rel="stylesheet" type="text/css" />
+        <script src="../index/js/contiki.js" type="text/javascript"></script>
+
+		<h2 class="page-title">Contiki 2.7</h2>
+        
+        <div class = "box_small box_centerContent">
+        	<button class = "box_choose" id="node_button">Node</button>
+        	<button class = "box_choose" id="border_router_button">Border Router</button>
+        	<button class = "box_choose" id="tunnel_button" onclick = "tunnel()">Tunnel</button>
+        </div>
+        
+        <!--  -->
+        <div class = "box_small hidden" id = "platforms">
+        	Please choose th platform, on which you would like to configurate your node or border router.
+        	<div id = "platforms_content"></div>
+        </div>
+        
+        <!-- In this section either the configuration for the node or the border router is displayed. -->
+		<div class="box_small hidden" id = "node_platform">
+			<h3> Configuration Panel for a sensor node</h3>
+			
+			<!-- In here we have all configuration concerning the one of the node -->
+			<div class = "configuration_content_and_information" id = "node_configuration_content_and_information" >
+				<div class = "configuration_content" id = "node_configuration_content" >
+					<div id="node_platform_content"></div>
+					<input class = "path_input" type="text" id="makeNodeFilePath" size="40"><br>
+				</div>
+				<div class = "information_configuration" id = "informationNodeConfiguration"></div>
+			</div>
+			
+			<!-- In the div "node_information" we have the information if we are running the make or install -->
+			<div class = "hidden" id = "node_information"></div>
+			<div class = "buttons">
+				<input class = "box_centerContent box_choose" type = "button" value = "Make" onclick = "makeNode()" id="makeNodeButton">
+				<input class = "box_centerContent box_choose hidden" type = "button" value = "Install" onclick = "installNode()" id="installNodeButton">
+				<input class = "box_centerContent box_choose hidden" type = "button" value = "Reset GUI" onclick = "resetNode()" id="resetNodeButton">
+			</div>
+		</div>
+		
+		<div class="box_small hidden" id = "border_platform">
+			<h3> Configuration Panel for a border router</h3>
+			
+			<!-- In here we have all configuration concerning the one of the border -->
+			<div class = "configuration_content_and_information" id = "border_configuration_content_and_information">
+				<div class = "configuration_content" id = "border_configuration_content" >
+					<div id = "border_platform_content"></div>
+					<input class = "path_input" type="text" id="makeBorderFilePath" size="40"><br>
+				</div>
+				<div class = "information_configuration" id = "informationBorderConfiguration"></div>
+			</div>
+			
+			<!-- In the div "border_information" we have the information if we are running the make or install -->
+			<div class = "hidden" id = "border_information"></div>
+			<div class = "buttons">
+				<input class = "box_centerContent box_choose" type = "button" value = "Make" onclick = "makeBorder()" id = "makeBorderButton">
+				<input class = "box_centerContent box_choose hidden" type = "button" value = "Install" onclick = "installBorder()" id="installBorderButton">
+				<input class = "box_centerContent box_choose hidden" type = "button" value = "Reset GUI" onclick = "resetBorder()" id="resetBorderButton">
+			</div>
+		</div>
+		
+		<!-- In this box the RAM and ROM of the configuration is displayed -->
+		<div class = "box_small hidden" id = "contiki_information">
+			<h3>Information of the configuration</h3>
+			The information of the RAM and ROM are based on the compiled project.
+			<div id = "contiki_information_content"></div>
+		</div>
+		
+		<!-- After a make or install the shell output is display in this box. -->
+        <div class = "box_big hidden" id = "shell">
+        	<h3>Shell output</h3>
+        	<div id = "shell_content">
+        		<img class = "loading_gif" src="/contiki/img/loading.GIF" alt="Loading" style="width:64px;height:64px;">
+        	</div>
+        </div>
+        
+        <!-- Tunnel Management -->
+        <div class = "box_huge hidden" id = "tunnel">
+        	<input class = "box_centerContent box_choose" type = "button" value = "Start Tunnel" id="startTunnelButton">
+        	Sudo:<input class = "password" type = "password" id = "tunnel_password" name = "Password" size="20"><br>
+        	<div id = tunnel_content""></div>
+        </div>
+
+        <script>
+        	loadConfigurations();
+        </script>
+	</body>
+</html>

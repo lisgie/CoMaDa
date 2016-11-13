@@ -1,0 +1,81 @@
+<div>
+	<div style="margin-bottom: 25px;">
+		<div style="margin-bottom: 5px">
+			<span>Save-Diagrams-Interval:</span>
+			<select id="saveinterval">
+				<option value="5">5 minutes</option>
+				<option value="10">10 minutes</option>
+				<option value="15">15 minutes</option>
+				<option value="30">30 minutes</option>
+				<option value="60">60 minutes</option>
+				<option value="120">120 minutes</option>
+			</select>
+		</div>
+		<div style="margin-bottom: 5px;">Create new feed: <input type="text" class="new_feed" value="feed name" style="border: 1px solid black; height: 1.5em; font-size: 0.9em;"/> <input id="create_button" type="button" value="create" style="position: relative; top: 1px; border: 1px solid black; height: 1.4em; cursor: pointer;"/> <img class="create_wait" src="/tinyos/img/wait.gif" style="display: none; position: relative; top: 3px; right: 1px; "/></div>
+		
+		<div id="feeds_cur" style="padding: 15px; border: 1px dashed black;">
+			<div style="font-size: 1.05em; margin: -10px 0 -10px -7px;font-weight: bold; cursor: pointer;" ng-click="toggle_cur()">
+				Current Feeds
+			</div>
+			
+			<div class="feeds" style="margin-top: 20px;">
+				<div class="feed">
+					<div style="font-weight: bold; font-size: 1.1em; margin-bottom: 3px;"><span class="feed_name_highlight" style="display: none; font-size: 1.1em; font-weight: bold; color: red;">-&gt;</span><a target="_blank" class="title vtip" title="click here to view this feed on the cosm page" href="https://cosm.com/feeds/{ID}"></a> <span class="visibility vtip" style="font-size: 0.7em; cursor: pointer;"></span></div>
+						<div><img class="wait" src="/tinyos/img/wait.gif" style="display: none; position: relative; top: 3px; right: 1px; "/></div>
+					<div class="node" style="padding-left: 20px;">
+					</div>
+					<div class="streams" style="padding-left: 100px; font-size: 0.85em;">
+						<div class="stream" style="float: left; margin-right: 30px;">
+							<div><img class="img" style="border: 0; width: 500px; height: 200px;" src="https://api.cosm.com/v2/feeds/{FEEDID}/datastreams/{STREAMID}.png?width=500&height=200&colour=%23f15a24&duration={DURATION}&title={STREAMID}&show_axis_labels=true&detailed_grid=true&scale=auto&timezone=+1" /></div>
+							<div style="padding-left: 30px;">
+								<div style="float: left;">
+									<a class="vtip del-ds-link" title="delete datastream" href="#"><img src="/cosm/img/btn_remove.gif" style="margin-right: 2px; position: relative; top: 2px; height: 16px; cursor: pointer; "/></a>
+								</div>
+								<div style="float: left;">
+									<select class="graph-duration">
+									  <option value="-other-">other:</option>
+									  <option value="5minutes" selected="selected">5 minutes</option>
+									  <option value="30minutes">30 minutes</option>
+									  <option value="1hour">1 hour</option>
+									  <option value="3hours">3 hours</option>
+									  <option value="1day">1 day</option>
+									  <option value="1week">1 week</option>
+									  <option value="30days">30 days</option>
+									  <option value="3months">3 months</option>
+									  <option value="6months">6 months</option>
+									  <option value="1year">1 year</option>
+									</select>
+								</div>
+								<div class="other_duration_container" style="float: left; display:none; ">
+									<input type="text" name="other_duration" style="width: 100px; height: 16px; position: relative; top: -1px; margin-left: 3px;font-size: 0.95em;" value="5minutes" />
+									<input type="button" name="other_duration_btn" value="update" style="height: 20px; font-size: 0.95em;" />
+								</div>
+								<div style="position: relative; top: 4px; float: left; margin-left: 10px;">
+									<a class="imglink" style="color: blue;" target="_blank" href="https://api.cosm.com/v2/feeds/{FEEDID}/datastreams/{STREAMID}.png?width=500&height=200&colour=%23f15a24&duration={DURATION}&title={STREAMID}&show_axis_labels=true&detailed_grid=true&scale=auto&timezone=+1">image link</a>
+								</div>
+								<div style="clear: both;"></div>
+							</div>
+						</div>
+						<div style="clear: both;"></div>
+					</div>
+						<div style="clear: both;"></div>
+				</div>
+			</div>
+		</div>
+		<div id="feeds_archive" style="padding: 15px; border: 1px dashed black; margin-top: 5px;">
+			<div style="font-size: 1.05em; margin: -10px 0 -10px -7px;font-weight: bold; cursor: pointer;" ng-click="toggle_arch()">
+				Archived Feeds
+			</div>
+			
+			<div class="feeds" style="display: none; margin-top: 20px;">
+			</div>
+		</div>
+		<div style="clear: both;">&nbsp;</div>
+	</div>
+	<div id="nodes" style="margin-top: 50px;">
+		<div class="cosm_node" style="vertical-align: top; float: left;">
+			<a class="assign_feed vtip" title="Click here and then click on a feed name to assign this node to it.\n(You may have to create one first.)\nBe careful all non fitting datastreams of this feed will be deleted!" href="#" style="color: blue; font-weight: bold; font-size: 0.8em;">assign feed</a><br/>
+			<div class="node" style="margin-top: 3px;"></div>
+		</div>
+	</div>
+</div>

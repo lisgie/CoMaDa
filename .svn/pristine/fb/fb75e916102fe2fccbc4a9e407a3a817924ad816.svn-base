@@ -1,0 +1,8 @@
+<!DOCTYPE html>
+<html>
+<body>
+	<h2 class="page-title"><a href="http://www.cosm.com">Cosm</a></h2>
+	
+	<widget:cosm></widget:cosm>
+</body>
+</html>

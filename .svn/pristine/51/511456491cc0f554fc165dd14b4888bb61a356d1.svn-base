@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<style type="text/css">
+			#module_entries .hasLink {
+				border-style: solid !important;
+			}
+			#module_entries .hasLink .module:hover {
+				text-decoration: underline;
+			}
+			h3 {
+				margin-bottom: 5px;
+				margin-top: 25px;
+			}
+			ul {
+				margin: 0;
+			}
+		</style>
+	</head>
+	
+	<body>
+		<h2 class="page-title">Welcome to the WSN-Framework!</h2>
+		
+		
+		
+		<div style="border-bottom: 1px solid black; margin: 0 -30px; padding: 0 30px 25px 30px;">
+			<!-- DESCRIPTION HERE -->
+			<div style="float: left;">
+				<div>
+					<div>
+						This Application gives you the opportunity to manage your WSN.<br/>
+						Therefor it offers a Java-API as well as this graphical user-interface.<br/>
+						You have virtual access to your WSN regardless of the Software or Hardware you are using.
+					</div>
+					
+					<div>
+						<h3>Currently Supported Hardware</h3>
+						<ul>
+							<li>IRIS (MTS300, MTS400)</li>
+							<li>TelosB</li>
+							<li>OPAL</li>
+						</ul>
+						
+						<h3>Supported Extensions</h3>
+						<ul>
+							<li>TinyIPFIX-Aggregation
+								<ul>
+									<li>Support of message aggregation and data pre-processing</li>
+									<li>Aggregation update in live sytem via UDP-Shell</li>
+								</ul>
+							</li>
+							<li>DTLS solution using OPAL clusterhead supporting message aggregation</li>
+							<li>Graphical User Interface
+								<ul>
+									<li>Node programming</li>
+									<li>Visualization (e.g. current network structure, live stream using COSM, TinyOS Listener)</li>
+									<li>Data Storage</li>
+								</ul>
+							</li>
+						</ul>
+						
+						<h3>VM available</h3>
+						<ul>
+							<li><a href="http://www.net.in.tum.de/pub/cs/WSN_VM.zip" class="urlextern" title="http://www.net.in.tum.de/pub/cs/WSN_VM.zip"  rel="nofollow"> VM download</a> (status 23.05.2012)</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+			<div style="float: right; width: 50%;">
+				<!-- <div style="float: left; margin-right: 10px; margin-top: 75px; width: 50%;">
+					<img src="/index/img/node-opal-icon.png" style="position: relative; top: -20px;"/><img src="/index/img/node-opal.png" style="width: 80px; height: 55px;"/><br/>
+					<img src="/index/img/node-telosb-icon.png" style="position: relative; top: -20px;"/><img src="/index/img/node-telosb.png" style="width: 80px; height: 61px;"/><br/>
+					<img src="/index/img/node-iris-icon.png" style="position: relative; top: -20px;"/><img src="/index/img/node-iris.png" style="width: 80px; height: 86px;"/>
+				</div> -->
+				<div style="float: right;">
+					<img style="width: 100%;" src="/index/img/wsn-overview.png"/>
+				</div>
+			</div>
+			<div style="clear: both;"></div>
+		</div>
+		
+		
+		
+		<div style="">
+			<div>
+				<div style="font-size: 1.1em; font-weight: bold; margin: 15px 0 5px -20px;">
+					Setup:
+				</div>
+				<div>
+					<div><b>Driver:</b> <span id="wsn_driver"></span></div>
+					<div>
+						<div><b>Protocol-Stack:</b></div>
+						<ul id="wsn_protocols">
+							
+						</ul>
+					</div>
+					<script type="text/javascript">
+					$("#wsn_driver").text(wsn_driver);
+					for (var p in wsn_protocols) {
+						$("#wsn_protocols").append("<li>"+wsn_protocols[p]+"</li>");
+					}
+					</script>
+				</div>
+			</div>
+			<div style="font-size: 1.1em; font-weight: bold; margin: 15px 0 5px 0px;">
+				Active Components:
+			</div>
+			<div id="module_entries" style="font-weight: normal; margin-top: 15px; margin-left: 20px;">
+				<div class="module_entry vtip" style="float: left; border: 1px dashed black; width: 440px; min-height: 37px; padding: 5px 10px 7px 8px; cursor: pointer; margin-bottom: 15px; margin-right: 20px;">
+					<div style="float: left; width: 32px; margin-right: 15px; padding-top: 2px;">
+						<img src=""
+								style="width: 32px; height: 32px;"
+								class="img" />
+					</div>
+					<div style="float: left;">
+						<div style="font-weight: bold;"><a class="module"></a></div>
+						<div class="message" style="margin: 5px 0 0 10px;"></div>
+					</div>
+				</div>
+				<div class="running"></div>
+				<div class="idling"></div>
+				<div class="error"></div>
+			</div>
+		</div>
+		<script type="text/javascript">
+			/*
+			 * required vars:
+		     * 		module_states = {
+			 *			module_class: [module_name, status, status_msg]
+			 *		}
+			 */
+		 
+			var moduleEntryTpl = create_template($(".module_entry"));
+			var moduleStateImgs = {
+					"RUNNING": "/index/img/module_status-running.png",
+					"ERROR": "/index/img/module_status-error.png",
+					"IDLING": "/index/img/module_status-idling.png",	
+			};
+			
+			for (var module in module_states) {
+				var mName = module_states[module][0];
+				var mStatus = module_states[module][1];
+				var mMsg = module_states[module][2];
+				
+				var tpl = new moduleEntryTpl();
+				tpl.el.attr("title", mStatus.toLowerCase());
+				tpl.el.find(".img").attr("src", moduleStateImgs[mStatus]);
+				tpl.el.find(".module").text(mName);
+				tpl.el.find(".message").text(mMsg);
+				
+				if (module_links[module] != null) {
+					tpl.el.addClass("hasLink");
+					tpl.el.find(".module").attr("href", module_links[module][0][1]);
+				}
+				
+				tpl.appendTo($("#module_entries ."+mStatus.toLowerCase()));
+			}
+		</script>
+	</body>
+</html>

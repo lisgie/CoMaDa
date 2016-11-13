@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	</head>
+	
+	<body>
+		<h2 class="page-title">Settings</h2>
+		<div>
+			This section lets you customize your WSN.<br/>
+			Please select a sub-entry from the menu that appears when hovering <b>"Settings"</b> in the above menu.
+		</div>
+	</body>
+</html>

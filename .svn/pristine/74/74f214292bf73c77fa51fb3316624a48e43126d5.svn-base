@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+	<body>
+		<h2 class="page-title">See you next time.. :)</h2>
+		
+		
+		<div style="height: 100%;">
+			<script type="text/javascript">
+				$.ajax({
+					"url": "/index/shutdownajax"
+				});
+			</script>
+		</div>
+		
+	</body>
+</html>

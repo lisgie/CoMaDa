@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	</head>
+	
+	<body>
+		<h2 class="page-title">Hardware</h2>
+		<div>
+		This section lets you interact with your Hardware, e.g. programming your motes!<br/>
+		Please select a sub-entry from the menu that appears when hovering <b>"Hardware"</b> in the above menu.
+		</div>
+	</body>
+</html>

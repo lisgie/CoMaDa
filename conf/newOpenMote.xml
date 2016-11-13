@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	<match>
+		<field>
+			<name>Temperature (SHT12)</name>
+			<fieldID>0x80B0</fieldID>
+			<enterpriseNumber>0x12345678</enterpriseNumber>
+			<type>Temperature</type>
+			<unit>°C</unit>
+			<expression><![CDATA[x/100]]></expression>
+		</field>
+		<field>
+			<name>Humidity (SHT12)</name>
+			<fieldID>0x80B1</fieldID>
+			<enterpriseNumber>0x12345678</enterpriseNumber>
+			<type>Humidity</type>
+			<unit>%</unit>
+			<expression><![CDATA[x/100]]></expression>
+		</field>
+		<field>
+			<name>MAX44009 Light</name>
+			<fieldID>0x80B2</fieldID>
+			<enterpriseNumber>0x12345678</enterpriseNumber>
+			<type>Light</type>
+			<unit>Lux</unit>
+			<expression><![CDATA[x/100]]></expression>
+		</field>
+		<field>
+			<name>Node Time</name>
+			<fieldID>0x80B3</fieldID>
+			<enterpriseNumber>0x12345678</enterpriseNumber>
+			<type>NodeTime</type>
+			<unit>sec</unit>
+			<expression><![CDATA[Math.round(x)]]></expression>
+		</field>
+		<field>
+			<name>NodeID</name>
+			<fieldID>0x80B4</fieldID>
+			<enterpriseNumber>0x12345678</enterpriseNumber>
+			<type>NodeID</type>
+			<expression><![CDATA[Math.round(x)]]></expression>
+		</field>		
+		<field>
+			<name>Pull Flag</name>
+			<fieldID>0x80B5</fieldID>
+			<enterpriseNumber>0x12345678</enterpriseNumber>
+			<type>Pull Flag</type>
+			<expression><![CDATA[Math.round(x)]]></expression>
+		</field>
+	</match>
+</configuration>

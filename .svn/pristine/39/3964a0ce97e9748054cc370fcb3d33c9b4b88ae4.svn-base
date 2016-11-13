@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	</head>
+	
+	<body>
+		<h2 class="page-title">Impressum</h2>
+		
+		<div>
+			<a href="http://wikistudi.corinna-schmitt.de/doku.php?id=impression_and_disclaimer">http://wikistudi.corinna-schmitt.de/doku.php?id=impression_and_disclaimer</a>
+		</div>
+		
+		<div style="margin-top: 20px;">
+			<div>
+				<div style="font-weight: bold;">Active Members</div>
+				<ul>
+					<li>
+						Philipp Lowack (MA): DTLS implementation for constraint sensor hardware → <a href="http://wikistudi.corinna-schmitt.de/doku.php?id=philip-lowack">student page</a>
+					</li>
+
+					<li>
+						André Freitag (Hiwi-activity): Framework development → <a href="http://wikistudi.corinna-schmitt.de/doku.php?id=andre-freitag">student page</a>
+					</li>
+				</ul>
+			</div>
+			<div>
+				<div style="font-weight: bold;">Alumni</div>
+				<ul>
+					<li>Matti Strese (Hiwi-activity): Driver development 
+					<li>Thomas Kothmayr (MA, BA, Hiwi-activity) 
+						<ul>
+							<li>BA: Data collection in WSNs for Autonomic Home Networks → <a href="http://wikistudi.corinna-schmitt.de/doku.php?id=thomas-kothmayr">student page</a></li>
+							<li>MA: Adaption of DTLS for a Cluster-based Security Protocol in Wireless Sensor Networks → <a href="http://wikistudi.corinna-schmitt.de/doku.php?id=thomas-kothmayr-2">student page</a></li>
+						</ul>
+					</li>
+					<li>Andreas Schaumeier (BA): Secure Communication in WSN → <a href="http://wikistudi.corinna-schmitt.de/doku.php?id=andreas-schaumeier">student page</a></li>
+					<li>Lukas Tillmann (BA): Communication Standards in WSNs → <a href="http://wikistudi.corinna-schmitt.de/doku.php?id=likas-tillmann">student page</a></li>
+					<li>Tsvetko Tsvetkov (BA): Performance Evaluation of Routing Protocols in Wireless Sensor Networks → <a href="http://wikistudi.corinna-schmitt.de/doku.php?id=tsvetko-tsvetkov">student page</a></li>
+					<li>Konrad Windszus (MA): Impact of asymmetric links on the performance of routing in Wireless Sensor Networks → <a href="http://wikistudi.corinna-schmitt.de/doku.php?id=windszus-konrad">student page</a></li>
+					<li>Benjamin Ertl (BA): Data Aggregation using TinyIPFIX → <a href="http://wikistudi.corinna-schmitt.de/doku.php?id=benjamin-ertl">student page</a></li>
+					<li>Christian Liedl (ZA): Security analysis for very constrainted objects → <a href="http://wikistudi.corinna-schmitt.de/doku.php?id=christian-liedl">student page</a></li>
+					<li>André Freitag (BA): Framework Development for WSNs facing Configuration and Information Exchange/Export Tasks → <a href="http://wikistudi.corinna-schmitt.de/doku.php?id=andre-freitag">student page</a></li>
+				</ul>
+			</div>
+		</div>
+	</body>
+</html>

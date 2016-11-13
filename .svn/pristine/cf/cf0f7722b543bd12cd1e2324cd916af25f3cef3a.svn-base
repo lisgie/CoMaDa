@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html>
+<head>
+		<script type="text/javascript" src="/index/js/d3.js"></script>
+		<script type="text/javascript" src="/index/js/d3.layout.js"></script>
+		<style type="text/css">
+			@import url("/index/css/cluster.css");
+		</style>
+</head>
+<body>
+		<div class="topology" style="width: 750px; height: 430px; margin-top: 25px;"></div>
+		
+		<script type="text/javascript">
+			/*
+			 * required vars:
+		     * 		WSNHTTPServerModule.getNodesVar()
+			 */
+			function wsnGraph(width, height, wsnnodes) {
+	
+				this.width = width;
+				this.height = height;
+				this.nodes = [];
+				this.nodeMap = {};
+				this.links = [];
+				
+				/* build topology */
+				var topology={length: 0, null: {length: 0}};
+				for (var nodeID in wsnnodes) {
+					topology[nodeID] = {length: 0};
+					topology.length++;
+				}
+				for (var nodeID in wsnnodes) {
+					var wsnnode=wsnnodes[nodeID];
+					for (var i=0; i<wsnnode.sendsTo.length; i++) {
+						topology[wsnnode.sendsTo[i]][nodeID] = wsnnode;
+						topology[wsnnode.sendsTo[i]].length++;
+					}
+				}
+
+				// use topological search to determine how to display the nodes
+				var layers=new Array();
+
+				while (topology.length > 0) {
+					var layer=new Array();
+					
+					// extract nodes with no dependencies
+					for (var nodeID in topology) {
+						if (wsnnodes[nodeID] == null) continue;
+						
+						if (topology[nodeID].length == 0) {
+							layer.push(wsnnodes[nodeID]);
+						}
+					}
+					
+					// remove extracted nodes
+					for (var i=0; i<layer.length; i++) {
+						for (var nodeID in topology) {
+							if (topology[nodeID][layer[i].nodeID] != null) {
+								delete(topology[nodeID][layer[i].nodeID]);
+								topology[nodeID].length--;
+							}
+						}
+						
+						delete(topology[layer[i].nodeID]);
+						topology.length--;
+					}
+					
+					layers.push(layer);
+				}
+				/*
+				TODO: add in-layer sorting (group WSNNodes that send to the same node)
+				*/
+				
+				
+				/* calculate nodes+links */
+				function d3n(x, y, name, parent, children, wsnnode) {
+					this.y = x;
+					this.x = y;
+					this.name = name;
+					if (wsnnode!=null)
+						this.wsnnode = wsnnode;
+					if (parent!=null)
+						this.parent=parent;
+					if (children!=null)
+						this.children=children;
+				}
+				function d3l(source, target) {
+					this.source = source;
+					this.target = target;
+				}
+				
+				// add nodes
+				this.nodes.push(new d3n(0, this.height/2, "Base", null, true));
+				this.nodeMap={null: this.nodes[0]};
+				for (var i=0; i<layers.length; i++) {
+					for (var j=0; j<layers[i].length; j++) {
+						var d3node = new d3n(									
+								this.width - (this.width / layers.length)*i,
+								(this.height / (2*layers[i].length))*(j*2+1) + (Math.pow(-1,i))*10,
+								layers[i][j].nodeID,
+								true,
+								(i>0) ? true : false,
+								layers[i][j]
+						);
+						this.nodes.push(d3node);
+						this.nodeMap[layers[i][j].nodeID] = d3node;
+					}
+				}
+				
+				// add links
+				for (var nodeID in wsnnodes) {
+					var node = wsnnodes[nodeID];
+					for (var i=0; i<node.sendsTo.length; i++) {
+						this.links.push(new d3l(
+							this.nodeMap[nodeID],
+							this.nodeMap[node.sendsTo[i]]
+						));
+					}
+				}
+			}
+			wsnGraph.prototype = {
+				width: null,
+				height: null,
+				nodes: null,
+				nodeMap: null,
+				links: null,
+			};
+		
+			topologyTpl = create_template($(".topology"), function(wsnnodes) {
+
+				var graph = new wsnGraph(this.el.width()-200, this.el.height(), wsnnodes);
+				
+				/* show d3 chart */
+				
+				// create D3 visualisation
+				var svg = d3.select(this.el.get(0))
+							.append("svg")
+			   				.attr("width", this.el.width())
+			    			.attr("height", this.el.height());
+				
+				svg.append("defs")
+				.append("marker")
+					.attr("id", "arrowMarkerBlack")
+					.attr("viewBox", "0 0 10 10")
+					.attr("refX", 21)
+					.attr("refY", 5)
+					.attr("markerUnits", "strokeWidth")
+					.attr("orient", "auto")
+					.attr("markerWidth", 10)
+					.attr("markerHeight", 7)
+					.append("path")
+						.attr("d", "M 0 0 L 10 5 L 0 10 z");
+				svg.append("defs")
+				.append("marker")
+					.attr("id", "arrowMarkerRed")
+					.attr("viewBox", "0 0 10 10")
+					.attr("refX", 21)
+					.attr("refY", 5)
+					.attr("markerUnits", "strokeWidth")
+					.attr("orient", "auto")
+					.attr("markerWidth", 10)
+					.attr("markerHeight", 7)
+					.attr("fill", "#ba0000")
+					.append("path")
+						.attr("d", "M 0 0 L 10 5 L 0 10 z");
+				
+				var vis = svg.append("g")
+					  		 .attr("transform", function(d) { return "translate(100,0)"; });
+				
+				// create dendrogram			
+				var link = vis.selectAll("path.link")
+								.data(graph.links)
+								.enter()
+									.append("path")
+										.attr("class", function(d) {
+											var c = "link";
+											if (d.target.wsnnode != null)
+												c += " " + escape(d.target.wsnnode.nodeID);
+											if (d.source.wsnnode != null)
+												c += " " + escape(d.source.wsnnode.nodeID);
+											if (d.target.wsnnode == null || d.source.wsnnode == null)
+												c += " null";
+											
+											return c;
+										})
+										.attr("d", d3.svg.diagonal().projection(function(d) { return [d.y, d.x]; }))
+										.attr("marker-end", "url(#arrowMarkerBlack)");
+				
+			
+				var node = vis.selectAll("g")
+								.data(graph.nodes)
+								.enter()
+									.append("g")
+										.attr("class", function(d) {return d.parent?"node":"base_node"})
+										.attr("name", function(d) {return d.wsnnode?escape(d.wsnnode.nodeID):"null"})
+										.attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; });
+
+				node.each(function(d) {
+					var el = d3.select(this).append("g");
+					
+					if (!d.parent) { // start node
+						el.attr("title", "Base Node").attr("class","vtip");
+						el.append("text")
+							.attr("dx", -42)
+							.attr("dy", 5)
+							.attr("style", "font-weight: bold; font-size: 1.5em;")
+							.attr("text-anchor", "start")
+							.text(function(d) { return d.name; });
+					} else { // middle node
+						el.attr("title", "Node")
+							.append("circle").attr("r", 10);
+						el.append("text")
+							.attr("dx", -5)
+							.attr("dy", 25)
+							.attr("style", "font-weight: bold; font-size: 1.2em;")
+							.attr("text-anchor", "start")
+							.text(function(d) { return d.name; });
+					}
+				});
+
+				this.el.find("svg g.node, #chart svg g.base_node").bind("mouseenter", {_this: this}, function(eve){
+
+					var nodeID = unescape($(this).attr("name"));
+					if (typeof(nodeTpl)!=='undefined' && nodeTpl.entries[nodeID]) {
+						nodeTpl.entries[nodeID].hover();
+					}
+					
+					eve.data._this.highlightLinks(nodeID);
+					
+				}).bind("mouseleave", {_this: this}, function(eve) {
+
+					var nodeID = unescape($(this).attr("name"));
+					if (typeof(nodeTpl)!=='undefined' && nodeTpl!=null && nodeTpl.entries[nodeID]) {
+						nodeTpl.entries[nodeID].hoverend();
+					}
+
+					eve.data._this.unhighlightLinks(nodeID);
+					
+				});
+				
+			}, {
+				"highlightLinks": function(nodeID) {
+					this.el.find("path."+escape(nodeID)).each(function() {
+						
+						$(this).css("stroke", "#ba0000");
+						
+					});
+				},
+				"unhighlightLinks": function(nodeID) {
+					this.el.find("path."+escape(nodeID)).each(function() {
+						
+						$(this).css("stroke", "");
+						
+					});
+				}
+			});
+				
+		</script>
+</body>
+</html>

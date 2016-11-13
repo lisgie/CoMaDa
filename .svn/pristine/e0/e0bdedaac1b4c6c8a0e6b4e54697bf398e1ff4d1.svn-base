@@ -1,0 +1,7 @@
+WSN exportiert die Events der WSNModule statisch wenn das Modul hinzugef�gt wird.
+	-> WSN selber hat aber dynamische Events
+	-> wenn WSNModule dynamische events bereitstellen (Events die erst zur Laufzeit in EventProvider::providedEvents eingetragen werden)
+		werden diese nicht vom WSN geproxiet (nur die Events dir zum Zeitpunkt des hinzuf�gens zum WSN schon in providedEvents stehen)
+
+the unit �C in a pachube feed makes the pachube module freeze in the ubuntu 9.10 VM
+	(�C is an attribute of an xml tag.. xerces doesn't like it -> loops really really long and aborts)

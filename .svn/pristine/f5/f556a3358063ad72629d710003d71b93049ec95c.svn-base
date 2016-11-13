@@ -1,0 +1,40 @@
+<configuration>
+
+	
+	<!--xxxxxxxxxxxxxxxxxxxxxxxxxxxxx appenders  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-->
+		<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+			<encoder>
+				<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+			</encoder>
+		</appender>
+	
+		<!-- log >=WARN to stderr -->
+		<appender name="STDERR" class="ch.qos.logback.core.ConsoleAppender">
+			<filter class="ch.qos.logback.classic.filter.ThresholdFilter"> 
+				<level>warn</level>
+			</filter>
+		
+			<encoder>
+				<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+			</encoder>
+			<target>System.err</target>
+		</appender>
+		
+		<!-- log to logback eclipse plugin http://logback.qos.ch/beagle/ -->
+		<appender name="BEAGLE" class="ch.qos.logback.classic.net.SocketAppender">
+			<remoteHost>localhost</remoteHost>
+			<port>4321</port>
+			<reconnectionDelay>10000</reconnectionDelay>
+		</appender>
+	<!--xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-->
+	
+	
+	<!-- root config -->
+	<root level="TRACE">
+		<!-- log everything >= WARN to stderr -->
+		<appender-ref ref="STDERR" />
+		<!-- log to logback eclipse plugin http://logback.qos.ch/beagle/ -->
+		<appender-ref ref="BEAGLE" />
+	</root>
+	
+</configuration>

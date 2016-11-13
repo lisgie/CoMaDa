@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<style type="text/css">
+			#module_entries .hasLink {
+				border-style: solid !important;
+			}
+			#module_entries .hasLink .module:hover {
+				text-decoration: underline;
+			}
+		</style>
+	</head>
+	
+	<body>
+		<h2 class="page-title">Log-Files</h2>
+		
+		<div>
+			Log-Files are stored in: <a class="logs-link" href="#" style="color: blue;"></a>
+			<script type="text/javascript">
+			$(function() {
+				$(".logs-link").attr("href", log_link).text(log_link);
+			});
+			</script>
+		</div>
+		
+		<div style="margin-top: 15px;">
+			<div style="float: left">
+				<img src="/index/img/logs.png"/>
+			</div>
+			<div style="float: left; margin-left: 150px;">
+				Log files are split up into one <b>master-log-file</b>, containing information about all nodes in one single place,<br/>
+				as well as one <b>single-log-file</b> for each node containing its data in a <b>tab-separated</b> format.
+			</div>
+			<div style="clear: both;"></div>
+		</div>
+	</body>
+</html>
